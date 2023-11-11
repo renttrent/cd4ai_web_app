@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { LoginForm } from "./LoginForm";
 
 
 export default function Login() {
 
     return <div>
-        <Button  variant='destructive'>Login</Button>
+        <LoginForm/>
     </div>
 }

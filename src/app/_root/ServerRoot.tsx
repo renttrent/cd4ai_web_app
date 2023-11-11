@@ -2,10 +2,12 @@ import { cn } from "@/lib/utils";
 import { Inter } from "next/font/google";
 import { PropsWithChildren } from "react";
 import { ClientRoot } from "./ClientRoot";
+import { getServerSession } from "next-auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const ServerRoot = async ({ children }: PropsWithChildren) => {
+  const session = await getServerSession();
   return (
     <html lang="en">
       <head>
@@ -17,13 +19,11 @@ export const ServerRoot = async ({ children }: PropsWithChildren) => {
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen  bg-background font-sans antialiased",
           inter.className
         )}
       >
-        <ClientRoot>
-        {children}
-        </ClientRoot>
+        <ClientRoot session={session}>{children}</ClientRoot>
       </body>
     </html>
   );
