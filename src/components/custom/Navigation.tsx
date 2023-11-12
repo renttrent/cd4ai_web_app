@@ -1,4 +1,6 @@
 import { AiFillTool, AiFillFolder, AiFillBook } from "react-icons/ai";
+import { BiSolidLogOut } from "react-icons/bi";
+
 import Link from "next/link";
 
 export const Navigation = () => {
@@ -24,6 +26,15 @@ export const Navigation = () => {
           <AiFillBook size={20} />
         </Link>
       </div>
+      <button
+        onClick={() => {
+          //logout
+          //TODO
+        }}
+        className="absolute bottom-3 m-2 p-2 text-white bg-indigo-400 rounded-full hover:bg-indigo-600"
+      >
+        <BiSolidLogOut size={20} />
+      </button>
     </nav>
   );
 };
