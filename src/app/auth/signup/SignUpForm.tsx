@@ -11,6 +11,7 @@ import { useValidatedForm } from "@/hooks/use-validated-form";
 import { useMutation } from "@tanstack/react-query";
 import { SignUpRequestParams, signUp } from "@/api/auth/signup";
 import { Link } from "lucide-react";
+import { Alert } from "@/components/ui/alert";
 
 type SignUpState = {
   firstname: string;
@@ -29,9 +30,9 @@ const signUpSchema: ObjectSchema<SignUpState> = object({
 interface SignUpForm extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function SignUpForm({ className, ...props }: SignUpForm) {
-  const { mutateAsync, isPending, isSuccess } = useMutation({
+  const { mutateAsync, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (data: SignUpRequestParams) => {
-      signUp(data);
+      return signUp(data);
     },
   });
   const { register, handleSubmit } = useValidatedForm({
@@ -40,8 +41,16 @@ export function SignUpForm({ className, ...props }: SignUpForm) {
 
   const onSubmit = async (data: SignUpState) => {
     console.log(data);
-    await mutateAsync(data);
+    //ignore catch
+    try {
+      await mutateAsync(data);
+    } catch {
+      //ignore
+    }
   };
+  console.log(error);
+  console.log("error", isError);
+  console.log("issuccess", isSuccess);
 
   return (
     <div
@@ -51,6 +60,7 @@ export function SignUpForm({ className, ...props }: SignUpForm) {
       )}
       {...props}
     >
+      {isError && <Alert>{error?.response?.data?.message}</Alert>}
       {isSuccess ? (
         <div className="flex flex-col gap-2 items-center">
           <span className="text-2xl font-semibold">SignUp Successful</span>

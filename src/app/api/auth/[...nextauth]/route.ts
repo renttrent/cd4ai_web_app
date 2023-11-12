@@ -1,3 +1,4 @@
+import { axios } from "@/api/axios";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
@@ -10,19 +11,30 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        // const res = await fetch(
-        //   `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-        //   {
-        //     username: credentials?.username,
-        //     password: credentials?.password,
-        //   }
-        // );
-        return null;
-        const user = { id: "1" };
-        if (user) {
-          return user;
+        try {
+          const { data } = await axios.post(
+            "/auth/login",
+            {
+              username: credentials?.username,
+              password: credentials?.password,
+            },
+            {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            }
+          );
+          const token = data?.body?.access_token;
+
+          if (token) {
+            return { id: "1", access_token: token };
+          }
+
+          return null;
+        } catch (e) {
+          console.log(e);
+          return null;
         }
-        return null;
       },
     }),
   ],
