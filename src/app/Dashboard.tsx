@@ -1,10 +1,11 @@
 "use client";
 
 import { getUser } from "@/api/user/get-user";
+import { Navigation } from "@/components/custom/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
-export const HomeClient = () => {
+export const Dashboard = () => {
   const query = useQuery({
     queryKey: ["user"],
     queryFn: getUser,
@@ -12,10 +13,9 @@ export const HomeClient = () => {
 
   const session = useSession();
   return (
-    <div>
-      {JSON.stringify(query.data?.data)}
-
-      <div>session: {JSON.stringify(session.data)}</div>
+    <div className="flex flex-row top-0 left-0 w-screen h-screen">
+      <Navigation />
+      <section className="w-full overflow-y-auto text-4xl"></section>
     </div>
   );
 };

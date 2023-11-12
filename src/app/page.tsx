@@ -1,20 +1,18 @@
 import { getServerSession } from "next-auth";
-import Image from "next/image";
-import { HomeClient } from "./Home";
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Dashboard } from "./Dashboard";
 
 export default async function Home() {
-  const session = await getServerSession();
+  // const session = await getServerSession();
+  const session = { user: true };
+
+  if (!session?.user) {
+    redirect("/auth/login");
+  }
+
   return (
     <main className="">
-      <HomeClient />
-      {!session?.user ? (
-        <Link href="/auth/login">Login </Link>
-      ) : (
-        <div>
-          <Link href="api/auth/signout">signout</Link>
-        </div>
-      )}
+      <Dashboard />
     </main>
   );
 }

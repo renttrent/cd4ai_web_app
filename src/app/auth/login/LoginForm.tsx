@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { useRouter } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
+
 type LoginState = {
   username: string;
   password: string;
@@ -68,7 +69,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       )}
       {...props}
     >
-      {isError && <Alert>Invalid Credentials</Alert>}
+      {isError && <Alert variant="destructive">Invalid Credentials</Alert>}
 
       <div className="flex flex-col gap-2 items-center">
         <span className="text-2xl font-semibold">Login to your account</span>
