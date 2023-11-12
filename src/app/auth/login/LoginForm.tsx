@@ -6,21 +6,60 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
+import { ObjectSchema, object, string } from "yup";
+import { useMutation } from "@tanstack/react-query";
+import { useValidatedForm } from "@/hooks/use-validated-form";
+import { useRouter } from "next/navigation";
+import { Alert } from "@/components/ui/alert";
+type LoginState = {
+  username: string;
+  password: string;
+};
+
+const LoginSchema: ObjectSchema<LoginState> = object({
+  username: string().required(),
+  password: string().required(),
+}).required();
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const router = useRouter();
+  const { mutateAsync, isPending, isSuccess, isError, error } = useMutation({
+    mutationFn: async (data: LoginState) => {
+      const res = await signIn("credentials", {
+        username: data.username,
+        password: data.password,
+        redirect: false,
+        callbackUrl: "/",
+      });
 
-  async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault();
-    setIsLoading(true);
+      if (res?.ok) {
+        return res;
+      }
+      if (res?.status === 401) {
+        throw res;
+      }
+      throw new Error("An error occurred");
+    },
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }
+    onSuccess: (data) => {
+      router.push("/");
+    },
+  });
+  const { register, handleSubmit } = useValidatedForm({
+    schema: LoginSchema,
+  });
 
+  const onSubmit = async (data: LoginState) => {
+    try {
+      await mutateAsync(data);
+    } catch {
+      //ignore
+    }
+  };
+  console.log("iserror", isError);
   return (
     <div
       className={cn(
@@ -29,43 +68,46 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       )}
       {...props}
     >
+      {isError && <Alert>Invalid Credentials</Alert>}
+
       <div className="flex flex-col gap-2 items-center">
         <span className="text-2xl font-semibold">Login to your account</span>
         <span className="text-sm text-gray-600">
           Enter your credentials below
         </span>
       </div>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              Email
+            <Label className="sr-only" htmlFor="username">
+              Username
             </Label>
             <Input
+              {...register("username")}
               id="email"
-              placeholder="name@example.com"
-              type="email"
+              placeholder="username"
+              type="text"
               autoCapitalize="none"
-              autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={isPending}
             />
           </div>
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
+            <Label className="sr-only" htmlFor="password">
               Password
             </Label>
             <Input
-              id="Password"
+              {...register("password")}
+              id="password"
               placeholder="Password"
               type="password"
               autoCapitalize="none"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={isPending}
             />
           </div>
-          <Button disabled={isLoading}>
-            {isLoading && <div>loading </div>}
+          <Button disabled={isPending}>
+            {isPending && <div>loading </div>}
             Sign In
           </Button>
         </div>

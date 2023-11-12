@@ -1,10 +1,10 @@
-import { axios } from "@/api/axios";
+import { http } from "@/server/api/http";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GithubProvider from "next-auth/providers/github";
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "Credentials",
       credentials: {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
@@ -12,7 +12,7 @@ const handler = NextAuth({
       },
       async authorize(credentials, req) {
         try {
-          const { data } = await axios.post(
+          const { data } = await http.post(
             "/auth/login",
             {
               username: credentials?.username,
@@ -24,20 +24,46 @@ const handler = NextAuth({
               },
             }
           );
+
+          console.log(data);
           const token = data?.body?.access_token;
 
           if (token) {
-            return { id: "1", access_token: token };
-          }
+            const res = await http.get("/user", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            console.log("user", res);
 
+            return {
+              ...res.data,
+              id: res.data?._id,
+              server_token: token,
+            };
+          }
           return null;
         } catch (e) {
-          console.log(e);
           return null;
         }
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token = { ...token, user: user };
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = token.user!!;
+      if (session?.user?.password) {
+        session.user.password = undefined;
+      }
+      return session;
+    },
+  },
 });
 
 export { handler as GET, handler as POST };

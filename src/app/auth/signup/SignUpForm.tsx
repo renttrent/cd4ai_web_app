@@ -10,8 +10,8 @@ import { string, object, ObjectSchema } from "yup";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { useMutation } from "@tanstack/react-query";
 import { SignUpRequestParams, signUp } from "@/api/auth/signup";
-import { Link } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
+import Link from "next/link";
 
 type SignUpState = {
   firstname: string;
@@ -40,17 +40,12 @@ export function SignUpForm({ className, ...props }: SignUpForm) {
   });
 
   const onSubmit = async (data: SignUpState) => {
-    console.log(data);
-    //ignore catch
     try {
       await mutateAsync(data);
     } catch {
       //ignore
     }
   };
-  console.log(error);
-  console.log("error", isError);
-  console.log("issuccess", isSuccess);
 
   return (
     <div
