@@ -1,10 +1,28 @@
+import { AiFillTool, AiFillFolder, AiFillBook } from "react-icons/ai";
+import Link from "next/link";
+
 export const Navigation = () => {
   return (
     <nav className="h-full bg-indigo-500">
-      <div className="flex flex-col gap-10 mt-24">
-        <div>Workbench</div>
-        <div>Documents</div>
-        <div>Classes</div>
+      <div className="flex flex-col gap-10 mt-24 items-center">
+        <Link
+          href="/"
+          className="m-2 p-2 text-white bg-indigo-700 rounded-full hover:bg-indigo-600"
+        >
+          <AiFillTool size={20} />
+        </Link>
+        <Link
+          href="/"
+          className="m-2 p-2 text-white bg-indigo-400 rounded-full hover:bg-indigo-600"
+        >
+          <AiFillFolder size={20} />
+        </Link>
+        <Link
+          href="/"
+          className="m-2 p-2 text-white bg-indigo-400 rounded-full hover:bg-indigo-600"
+        >
+          <AiFillBook size={20} />
+        </Link>
       </div>
     </nav>
   );
