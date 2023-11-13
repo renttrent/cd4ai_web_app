@@ -1,6 +1,7 @@
 import { http } from "@/server/api/http";
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -25,7 +26,6 @@ const handler = NextAuth({
             }
           );
 
-          console.log(data);
           const token = data?.body?.access_token;
 
           if (token) {
@@ -34,7 +34,6 @@ const handler = NextAuth({
                 Authorization: `Bearer ${token}`,
               },
             });
-            console.log("user", res);
 
             return {
               ...res.data,
@@ -58,9 +57,12 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       session.user = token.user!!;
-      if (session?.user?.password) {
+      // @ts-ignore
+      if (token.user?.password) {
+        // @ts-ignore
         session.user.password = undefined;
       }
+      console.log(session.user);
       return session;
     },
   },
