@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { useRouter } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
+import { PulseLoader } from "react-spinners";
 
 type LoginState = {
   username: string;
@@ -60,7 +61,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       //ignore
     }
   };
-  console.log("iserror", isError);
+
   return (
     <div
       className={cn(
@@ -108,8 +109,8 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
             />
           </div>
           <Button disabled={isPending}>
-            {isPending && <div>loading </div>}
-            Sign In
+            {isPending && <PulseLoader size={7} color="white" />}
+            {!isPending && <span>Sign In</span>}
           </Button>
         </div>
       </form>
