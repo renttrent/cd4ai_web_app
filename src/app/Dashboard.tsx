@@ -31,7 +31,7 @@ export const Dashboard = () => {
         setProjectFormVisible(false);
     };
     return (
-        <div className="flex flex-row top-0 left-0 w-screen h-screen">
+        <div className="font-serif flex flex-row top-0 left-0 w-screen h-screen">
             <Navigation/>
             <section className="w-full overflow-y-auto p-10">
                 <Header onAddProjectClick={openProjectForm} />

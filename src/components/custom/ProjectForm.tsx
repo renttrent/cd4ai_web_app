@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../lib/auth';
-import api, { ApiResponse } from '../../lib/api';
 
 interface ProjectFormProps {
     onClose: () => void;
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ onClose }) => {
-    const { user } = useAuth();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [csvFiles, setCsvFiles] = useState<File[]>([]);
@@ -32,17 +29,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose }) => {
             const formData = new FormData();
             formData.append('name', name);
             formData.append('description', description);
-            formData.append('userId', user?.id || '');
+            //formData.append('userId', user?.id || '');
             csvFiles.forEach((file, i) => {
                 formData.append(`csvFiles[${i}]`, file);
             });
 
-            const response = await api.post<ApiResponse>('/projects', formData, {
+            /* const response = await api.post<ApiResponse>('/projects', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-            });
-            // ...
+            }); */
             onClose();
         } catch (error) {
             console.error('Error creating project:', error);
@@ -51,7 +47,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose }) => {
     };
 
     return (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+        <div className="font-serif fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-8 rounded-md w-96 relative">
                 <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
@@ -87,7 +83,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose }) => {
                         />
                     </label>
                     {csvFiles.length > 0 && (
-                        <div className="mt-2">
+                        <div className="font-serif mt-2">
                             <span className="text-gray-700">Selected Files:</span>
                             <ul className="list-disc pl-4">
                                 {csvFiles.map((file, index) => (
@@ -101,7 +97,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose }) => {
                             </ul>
                         </div>
                     )}
-                    <div className="flex justify-between">
+                    <div className="font-serif flex justify-between">
                         <button type="submit" className="bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-700">
                             Create Project
                         </button>

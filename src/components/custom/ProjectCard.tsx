@@ -16,8 +16,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     }
 
     return (
-        <div className="p-4 border rounded-sm bg-indigo-50">
-            <div className="font-medium text-sm text-indigo-400">Project</div>
+        <div className="font-serif p-4 border rounded-sm bg-indigo-50">
             <div className="font-bold text-lg">{project.name}</div>
             <div className="text-lg">Subtitle</div>
             <div className="text-sm text-gray-500">{project.description}</div>
