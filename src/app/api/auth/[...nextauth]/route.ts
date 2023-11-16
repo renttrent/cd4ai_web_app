@@ -49,20 +49,21 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token = { ...token, user: user };
       }
+      token.accessToken = account?.access_token;
       return token;
     },
     async session({ session, token }) {
       session.user = token.user!!;
       // @ts-ignore
+      session.accessToken = token.accessToken;
       if (token.user?.password) {
         // @ts-ignore
         session.user.password = undefined;
       }
-      console.log(session.user);
       return session;
     },
   },

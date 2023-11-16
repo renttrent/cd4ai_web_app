@@ -2,6 +2,7 @@ import { AiFillTool, AiFillFolder, AiFillBook } from "react-icons/ai";
 import { BiSolidLogOut } from "react-icons/bi";
 
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 
 export const Navigation = () => {
   return (
@@ -28,8 +29,7 @@ export const Navigation = () => {
       </div>
       <button
         onClick={() => {
-          //logout
-          //TODO
+          signOut();
         }}
         className="absolute bottom-3 m-2 p-2 text-white bg-indigo-400 rounded-full hover:bg-indigo-600"
       >
