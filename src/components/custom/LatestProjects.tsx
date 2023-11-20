@@ -39,6 +39,9 @@ export const LatestProjectsView = () => {
 
 import React, { useState, useEffect } from "react";
 import { ProjectCard } from "./ProjectCard";
+import { useQuery } from "@tanstack/react-query";
+import { http } from "@/server/api/http";
+import { getProjects } from "@/util/projects/projects";
 
 export const LatestProjectsView = () => {
   const [projects, setProjects] = useState<
@@ -50,6 +53,13 @@ export const LatestProjectsView = () => {
     }>
   >([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { data, isError } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getProjects,
+  });
+
+  console.log(data);
 
   useEffect(() => {
     const mockProjects = [
