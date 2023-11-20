@@ -1,5 +1,5 @@
 import { Label } from "@radix-ui/react-label";
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, MutableRefObject, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { IoIosCloseCircle } from "react-icons/io";
 import { Input } from "../ui/input";
@@ -26,6 +26,8 @@ export const AddProjectModal = ({
 }: {
   onClose: MouseEventHandler<HTMLButtonElement>;
 }) => {
+  const modalRef = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
+
   const { register, handleSubmit } = useValidatedForm({
     schema: ProjectSchema,
   });
@@ -44,10 +46,28 @@ export const AddProjectModal = ({
     }
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      //@ts-ignore
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        // @ts-ignore
+        onClose();
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
+
   return createPortal(
     <div>
       <div className="absolute top-0 left-0 w-screen h-screen bg-black/20" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 shadow-xl w-1/2 rounded-lg">
+      <div
+        ref={modalRef}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 shadow-xl w-1/2 rounded-lg"
+      >
         <div className="relative w-full">
           <button onClick={onClose} className="absolute right-4 top-2 text-xl">
             <IoIosCloseCircle />
