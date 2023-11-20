@@ -6,8 +6,8 @@ import { Navigation } from "@/components/custom/Navigation";
 import { useSession } from "next-auth/react";
 import { Project } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
-import { getUser } from "@/api/user/get-user";
-import { getProjects } from "@/api/projects/projects";
+import { getUser } from "@/util/user/get-user";
+import { getProjects } from "@/util/projects/projects";
 import ProjectForm from "@/components/custom/ProjectForm";
 
 export const Dashboard = () => {

@@ -1,18 +1,17 @@
 "use client";
 
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { ObjectSchema, object, string } from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { useRouter } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
 import { PulseLoader } from "react-spinners";
+import { useEffect } from "react";
 
 type LoginState = {
   username: string;
@@ -45,14 +44,16 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       }
       throw new Error("An error occurred");
     },
-
-    onSuccess: (data) => {
-      router.push("/");
-    },
   });
   const { register, handleSubmit } = useValidatedForm({
     schema: LoginSchema,
   });
+
+  useEffect(() => {
+    if (isSuccess) {
+      router.push("/");
+    }
+  }, [isSuccess]);
 
   const onSubmit = async (data: LoginState) => {
     try {
