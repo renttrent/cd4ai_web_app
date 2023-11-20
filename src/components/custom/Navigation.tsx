@@ -1,3 +1,5 @@
+"use client";
+
 import { AiFillTool, AiFillFolder, AiFillBook } from "react-icons/ai";
 import { BiSolidLogOut } from "react-icons/bi";
 

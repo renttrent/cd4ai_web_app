@@ -1,6 +1,7 @@
+import { Header } from "@/components/custom/Header";
+import LatestProjectsView from "@/components/custom/LatestProjects";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { Dashboard } from "./Dashboard";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -8,10 +9,10 @@ export default async function Home() {
   if (!session?.user) {
     redirect("/auth/login");
   }
-
   return (
-    <main className="">
-      <Dashboard />
-    </main>
+    <div>
+      <Header />
+      <LatestProjectsView />
+    </div>
   );
 }

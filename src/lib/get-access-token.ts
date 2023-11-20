@@ -6,5 +6,6 @@ export const getAccessToken = async () => {
     | (Session & { user: { server_token: string } })
     | null;
 
+  console.log(session?.user.server_token);
   return session?.user?.server_token;
 };

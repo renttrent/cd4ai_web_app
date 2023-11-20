@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "CD4AI",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

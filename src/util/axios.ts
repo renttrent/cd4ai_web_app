@@ -1,7 +1,7 @@
 import { getAccessToken } from "@/lib/get-access-token";
 import axiosMain from "axios";
 
-export const axios = axiosMain.create({
+const axios = axiosMain.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
@@ -11,3 +11,5 @@ axios.interceptors.request.use(async function (config) {
   config.headers.Authorization = "Bearer " + token;
   return config;
 });
+
+export { axios };
