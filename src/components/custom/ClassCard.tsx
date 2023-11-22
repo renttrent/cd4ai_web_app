@@ -18,23 +18,22 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
                 <p className="text-base text-gray-600">{classItem.longDescription}</p>
                 <div className="text-base text-gray-600">
                     <span className="font-semibold text-gray-700">Initial Keywords:</span>{" "}
-                    <div className="flex flex-row gap-4 mt-2 flex-wrap">
+                    <div className="flex flex-row gap-2 mt-2 flex-wrap">
                         {classItem.initKeywords.length > 4 ? (
                             <>
                                 {classItem.initKeywords.slice(0, 4).map((keyword, idx) => (
                                     <div
                                         key={idx}
-                                        className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                        className={`flex items-center text-xs px-1 py-0.5 rounded-md border border-gray-300 mr-1 mb-1`}
                                         style={{
-                                            borderColor: colors.teal[500],
-                                            color: colors.teal[500],
+                                            color: colors.purple[600],
                                         }}
                                     >
                                         {keyword}
                                     </div>
                                 ))}
                                 <Link href={`/class/${classItem.project_id}`} passHref>
-                                    <div className="text-base text-purple-600 font-semibold underline cursor-pointer">
+                                    <div className="text-xs text-gray-600 font-semibold underline cursor-pointer">
                                         See More
                                     </div>
                                 </Link>
@@ -43,10 +42,9 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
                             classItem.initKeywords.map((keyword, idx) => (
                                 <div
                                     key={idx}
-                                    className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                    className={`flex items-center text-xs px-1 py-0.5 rounded-md border border-gray-300 mr-1 mb-1`}
                                     style={{
-                                        borderColor: colors.teal[500],
-                                        color: colors.teal[500],
+                                        color: colors.purple[600],
                                     }}
                                 >
                                     {keyword}
@@ -57,15 +55,14 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
                 </div>
                 <div className="text-base text-gray-600">
                     <span className="font-semibold text-gray-700">Final Keywords:</span>{" "}
-                    <div className="flex flex-row gap-4 mt-2 flex-wrap">
+                    <div className="flex flex-row gap-2 mt-2 flex-wrap">
                         {showMore
                             ? classItem.finalKeywords.map((keyword, idx) => (
                                 <div
                                     key={idx}
-                                    className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                    className={`flex items-center text-xs px-1 py-0.5 rounded-md border border-gray-300 mr-1 mb-1`}
                                     style={{
-                                        borderColor: colors.lime[500],
-                                        color: colors.lime[500],
+                                        color: colors.purple[600],
                                     }}
                                 >
                                     {keyword}
@@ -74,10 +71,9 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
                             : classItem.finalKeywords.slice(0, 4).map((keyword, idx) => (
                                 <div
                                     key={idx}
-                                    className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                    className={`flex items-center text-xs px-1 py-0.5 rounded-md border border-gray-300 mr-1 mb-1`}
                                     style={{
-                                        borderColor: colors.lime[500],
-                                        color: colors.lime[500],
+                                        color: colors.purple[600],
                                     }}
                                 >
                                     {keyword}
@@ -85,7 +81,7 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
                             ))}
                         {classItem.finalKeywords.length > 4 && (
                             <div
-                                className="text-base text-purple-600 font-semibold underline cursor-pointer"
+                                className="text-xs text-gray-600 font-semibold underline cursor-pointer"
                                 onClick={() => setShowMore(!showMore)}
                             >
                                 {showMore ? "See Less" : "See More"}
