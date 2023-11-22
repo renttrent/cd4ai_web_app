@@ -10,5 +10,9 @@ export type SignUpRequestParams = {
 };
 
 export const signUp = async (data: SignUpRequestParams) => {
-  return await axios.post("/auth/register", data);
+  return await axios.post("/auth/register", data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };

@@ -9,12 +9,14 @@ export interface Project {
   }[];
 }
 export interface Class {
-  id: string;
+  _id: string;
   name: string;
-  shortDescription: string;
-  longDescription: string;
-  projectId: string;
-  initKeywords: string[];
-  creationDate: string; // Example, should match your API response structure
-  isFavorite: boolean; // Whether the class is a favorite for the user
+  short_description: string;
+  long_description: string;
+  project_id: string;
+  init_keywords: string[];
+  extracted_keywords: string[];
+  final_keywords: string[];
+  creation_date: string; // Example, should match your API response structure
+  is_favorite: boolean; // Whether the class is a favorite for the user
 }

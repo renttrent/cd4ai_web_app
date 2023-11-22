@@ -25,7 +25,7 @@ const ClassSchema: ObjectSchema<ClassState> = object({
   project_id: string().required(),
   init_keywords: string()
     .required()
-    .matches(/^[a-zA-Z,]+$/),
+    .matches(/^[a-zA-Z ,]+$/),
 });
 
 export const CreateClassForm = ({ projectId }: { projectId: string }) => {
@@ -38,7 +38,16 @@ export const CreateClassForm = ({ projectId }: { projectId: string }) => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: ClassState) => {
-      return createClass(data);
+      const { init_keywords, ...rest } = data;
+
+      const keywords = init_keywords
+        .split(",")
+        .map((keyword) => keyword.trim());
+      const classData = {
+        ...rest,
+        init_keywords: keywords,
+      };
+      return createClass(classData);
     },
   });
 
