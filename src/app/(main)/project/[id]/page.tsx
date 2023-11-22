@@ -22,8 +22,24 @@ const generateFakeClasses = (): Class[] => {
             shortDescription: "Short description for Class 1",
             longDescription: "Long description for Class 1",
             project_id: "project_id_1",
-            initKeywords: ["keyword1", "keyword2"],
-            finalKeywords: ["result1", "result2"],
+            initKeywords: [
+                "keyword1",
+                "keyword2",
+                "keyword3",
+                "keyword4",
+                "keyword5",
+                "keyword6",
+                // ... Add more keywords to test the "See More" functionality
+            ],
+            finalKeywords: [
+                "result1",
+                "result2",
+                "result3",
+                "result4",
+                "result5",
+                "result6",
+                // ... Add more keywords to test the "See More" functionality
+            ],
         },
         {
             name: "Class 2",
@@ -134,62 +150,103 @@ const Page = ({
             {showCreateClass && (
                 <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
                     <div className="bg-white p-4 rounded-md">
-                        {/* Content for the create class form */}
+                        {/* Content for the create class form */}   // TODO : ISHWOR
                         <button onClick={() => setShowCreateClass(false)}>Close</button>
                     </div>
                 </div>
             )}
             <div className="mt-8">
-                <h3 className="text-xl font-semibold text-purple-700">Classes</h3>
-                <div className="flex flex-wrap gap-4 mt-4">
-                    {classes.map((classItem, index) => (
-                        <div
-                            key={index}
-                            className="border rounded-md p-4 bg-purple-100 border-purple-300"
-                            style={{ minWidth: "200px" }}
-                        >
+                {classes.map((classItem, index) => (
+                    <div
+                        key={index}
+                        className="border rounded-md bg-gray-50 border-purple-300 mb-4 p-4 flex flex-col"
+                        style={{ minWidth: "200px" }}
+                    >
+                        <div className="flex-grow">
                             <h4 className="font-semibold text-lg text-purple-900">{classItem.name}</h4>
                             <p className="text-base text-gray-500 mt-2">{classItem.shortDescription}</p>
-                            <p className="text-base text-gray-600">
-                                {classItem.longDescription}
-                            </p>
+                            <p className="text-base text-gray-600">{classItem.longDescription}</p>
                             <div className="text-base text-gray-600">
                                 <span className="font-semibold text-gray-700">Initial Keywords:</span>{" "}
-                                <div className="flex flex-row gap-4 mt-2">
-                                    {classItem.initKeywords.map((keyword, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
-                                            style={{
-                                                borderColor: colors.teal[500], // You can replace this with getColor logic if needed
-                                                color: colors.teal[500], // You can replace this with getColor logic if needed
-                                            }}
-                                        >
-                                            {keyword}
-                                        </div>
-                                    ))}
+                                <div className="flex flex-row gap-4 mt-2 flex-wrap">
+                                    {classItem.initKeywords.length > 4 ? (
+                                        <>
+                                            {classItem.initKeywords.slice(0, 4).map((keyword, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                                    style={{
+                                                        borderColor: colors.teal[500],
+                                                        color: colors.teal[500],
+                                                    }}
+                                                >
+                                                    {keyword}
+                                                </div>
+                                            ))}
+                                            <Link href={`/class/${classItem.project_id}`} passHref>
+                                                <div className="text-base text-purple-600 font-semibold underline cursor-pointer">
+                                                    See More
+                                                </div>
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        classItem.initKeywords.map((keyword, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                                style={{
+                                                    borderColor: colors.teal[500],
+                                                    color: colors.teal[500],
+                                                }}
+                                            >
+                                                {keyword}
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
                             </div>
                             <div className="text-base text-gray-600">
                                 <span className="font-semibold text-gray-700">Final Keywords:</span>{" "}
-                                <div className="flex flex-row gap-4 mt-2">
-                                    {classItem.finalKeywords.map((keyword, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
-                                            style={{
-                                                borderColor: colors.lime[500], // You can replace this with getColor logic if needed
-                                                color: colors.lime[500], // You can replace this with getColor logic if needed
-                                            }}
-                                        >
-                                            {keyword}
-                                        </div>
-                                    ))}
+                                <div className="flex flex-row gap-4 mt-2 flex-wrap">
+                                    {classItem.finalKeywords.length > 4 ? (
+                                        <>
+                                            {classItem.finalKeywords.slice(0, 4).map((keyword, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                                    style={{
+                                                        borderColor: colors.lime[500],
+                                                        color: colors.lime[500],
+                                                    }}
+                                                >
+                                                    {keyword}
+                                                </div>
+                                            ))}
+                                            <Link href={`/class/${classItem.project_id}`} passHref>
+                                                <div className="text-base text-purple-600 font-semibold underline cursor-pointer">
+                                                    See More
+                                                </div>
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        classItem.finalKeywords.map((keyword, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`flex flex-row items-center gap-2 text-base w-fit px-2 py-1 rounded-md border-2`}
+                                                style={{
+                                                    borderColor: colors.lime[500],
+                                                    color: colors.lime[500],
+                                                }}
+                                            >
+                                                {keyword}
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
