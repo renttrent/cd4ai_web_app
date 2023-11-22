@@ -11,6 +11,7 @@ import colors from "tailwindcss/colors";
 import {useEffect, useState} from "react";
 import {Class} from "@/types/types";
 import ClassCard from "@/components/custom/ClassCard";
+import {AiFillFolderOpen} from "react-icons/ai";
 
 const Skeleton = () => {
     // TODO
@@ -134,17 +135,17 @@ const Page = ({
                 {project?.description}
             </div>
             <div className="text-stone-700">Files:</div>
-            <div className="flex flex-row gap-4">
-                {project?.files_meta_str.map((file, index) => (
+            <div className="flex flex-row flex-wrap gap-2 mt-4">
+                {project?.files?.map((file, index) => (
                     <div
                         key={index}
-                        className={`flex flex-row items-center gap-2 text-xs mt-4 w-fit px-2 py-1 rounded-md border-2`}
+                        className={`flex items-center text-xs px-2 py-1 rounded-md border border-gray-300`}
                         style={{
-                            borderColor: getColor(index),
-                            color: getColor(index),
+                            color: colors.purple[600],
                         }}
                     >
-                        {file.file_name}
+                        <AiFillFolderOpen className="mr-1" />
+                        <span>{file.file_name}</span>
                     </div>
                 ))}
             </div>
