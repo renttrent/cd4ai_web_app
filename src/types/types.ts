@@ -1,20 +1,22 @@
 export interface Project {
-  _id: string;
+  project_id: string;
   name: string;
   description: string;
   modification_time: string;
-  files: {
+  files: {   // files should be path , it is different from files_meta_str
+    file_name: string;
+    column_name: string;
+  }[];
+  files_meta_str: {
     file_name: string;
     column_name: string;
   }[];
 }
 export interface Class {
-  id: string;
   name: string;
   shortDescription: string;
   longDescription: string;
-  projectId: string;
+  project_id: string;
   initKeywords: string[];
-  creationDate: string; // Example, should match your API response structure
-  isFavorite: boolean; // Whether the class is a favorite for the user
+  finalKeywords: string[];
 }
