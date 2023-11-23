@@ -61,7 +61,9 @@ export default function Login() {
     >
       {isError && (
         // @ts-ignore
-        <Alert variant="destructive">{`Sign Up Failed - ${error.response.data.message}`}</Alert>
+        <Alert variant="destructive">{`Sign Up Failed - ${JSON.stringify(
+          error
+        )}`}</Alert>
       )}
       <div className="flex flex-col gap-2 items-center">
         <span className="text-2xl font-semibold">Create new account</span>

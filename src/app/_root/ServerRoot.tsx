@@ -3,11 +3,13 @@ import { Inter } from "next/font/google";
 import { PropsWithChildren } from "react";
 import { ClientRoot } from "./ClientRoot";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const ServerRoot = async ({ children }: PropsWithChildren) => {
   const session = await getServerSession();
+
   return (
     <html lang="en">
       <head>
