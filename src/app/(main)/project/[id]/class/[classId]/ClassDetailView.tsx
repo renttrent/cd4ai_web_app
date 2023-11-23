@@ -5,17 +5,35 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import {
-  getClassById,
-  getClassesByProjectId,
-  updateClass,
-} from "@/util/classes/classes";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { getClassById } from "@/util/classes/classes";
+import { useQuery } from "@tanstack/react-query";
 import { BarLoader, PulseLoader } from "react-spinners";
 import { array, object, string } from "yup";
 import { useUpdateClass } from "../_hooks/use-update-class";
 import { LoadingButton } from "@/components/ui/loadingbutton";
 import { Class } from "@/types/types";
+import { checkTaskStatus } from "@/util/keyword-extraction/check-task-status";
+import { useStartKeywordsExtraction } from "../_hooks/use-keyword-extraction";
+import { useCallback, useState } from "react";
+import { useCancelTask } from "../_hooks/use-cancel_task";
+
+const addTaskToLocalStorage = (classId: string, taskId: string) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(`current_task-${classId}`, taskId);
+  }
+};
+
+const removeTaskFromLocalStorage = (classId: string) => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(`current_task-${classId}`);
+  }
+};
+
+const getTaskFromLocalStorage = (classId: string) => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(`current_task-${classId}`);
+  }
+};
 
 enum ExtractionState {
   NOT_STARTED = "not-started",
@@ -32,17 +50,55 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
     },
   });
 
-  const taskInProgress = false;
+  const [associatedTaskId, setTaskId] = useState<string | null | undefined>(
+    getTaskFromLocalStorage(classId)
+  );
+  const { data: taskStatus } = useQuery({
+    queryKey: ["task", associatedTaskId],
+    enabled: associatedTaskId != null,
+    refetchInterval: 2000,
+    queryFn: async () => {
+      const res = associatedTaskId && (await checkTaskStatus(associatedTaskId));
+      res == "SUCCESS" && removeTaskId();
+      res == "SUCCESS" && window.location.reload();
+      return res;
+    },
+  });
+
+  const removeTaskId = () => {
+    setTaskId(null);
+    removeTaskFromLocalStorage(classId);
+  };
+
+  const onKeywordsExtractionSuccessCallback = useCallback(
+    (res: { task_id: string | null }) => {
+      setTaskId(res.task_id);
+      res.task_id && addTaskToLocalStorage(classId, res.task_id);
+    },
+    []
+  );
+
+  const { mutateAsync } = useStartKeywordsExtraction(
+    onKeywordsExtractionSuccessCallback
+  );
+
+  const { mutateAsync: stopKeywordsExtraction } = useCancelTask(() =>
+    removeTaskId()
+  );
+
+  const taskInProgress = taskStatus == "STARTED";
 
   if (isLoading || taskInProgress == undefined) {
     return <BarLoader width="100%" className="mt-4" />;
   }
 
-  const extractionState: ExtractionState = data?.extracted_keywords
+  const extractionState: ExtractionState = false
     ? ExtractionState.COMPLETED
     : taskInProgress
     ? ExtractionState.IN_PROGRESS
     : ExtractionState.NOT_STARTED;
+
+  console.log(extractionState);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 justify-between flex-wrap">
@@ -50,9 +106,19 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
         <div className="flex gap-2 ">
           <Button variant="destructive">Delete</Button>
           {extractionState == ExtractionState.NOT_STARTED ? (
-            <Button>Start Keyword Extraction</Button>
+            <Button onClick={() => mutateAsync({ classId: classId })}>
+              Start Keyword Extraction
+            </Button>
           ) : extractionState == ExtractionState.IN_PROGRESS ? (
-            <Button>Stop Extraction</Button>
+            <Button
+              onClick={() =>
+                associatedTaskId &&
+                stopKeywordsExtraction({ taskId: associatedTaskId })
+              }
+            >
+              <PulseLoader size={7} color="white" />
+              <span> Cancel Extraction</span>
+            </Button>
           ) : null}
         </div>
       </div>
@@ -67,8 +133,10 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
       <div className="flex flex-col gap-1">
         <h2 className="font-bold">Initial Keywords</h2>
         <div className="flex gap-2 text-xl">
-          {data?.init_keywords.map((keyword) => (
-            <Badge variant="outline">{keyword}</Badge>
+          {data?.init_keywords.map((keyword, index) => (
+            <Badge key={index} variant="outline">
+              {keyword}
+            </Badge>
           ))}
         </div>
       </div>
