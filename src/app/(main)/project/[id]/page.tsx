@@ -13,6 +13,8 @@ import { Class } from "@/types/types";
 import ClassCard from "@/components/custom/ClassCard";
 import { getClassesByProjectId } from "@/util/classes/classes";
 import { CreateClassForm } from "./class/_ui/CreateClassForm";
+import { useRouter } from "next/navigation";
+import { XIcon } from "lucide-react";
 
 const Skeleton = () => {
   // TODO
@@ -28,6 +30,7 @@ const Page = ({
 }) => {
   const [showCreateClass, setShowCreateClass] = useState(false);
 
+  const nav = useRouter();
   const [projectQuery, classQuery] = useQueries({
     queries: [
       {
@@ -120,9 +123,19 @@ const Page = ({
       </div>
       {showCreateClass && (
         <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-4 rounded-md w-2xl">
-            <CreateClassForm projectId={project._id} />
-            <button onClick={() => setShowCreateClass(false)}>Close</button>
+          <div className="bg-white p-4 rounded-md w-full mx-4 max-w-2xl">
+            <div className="flex flex-row-reverse">
+              <button onClick={() => setShowCreateClass(false)}>
+                <XIcon />
+              </button>
+            </div>
+            <CreateClassForm
+              onSuccess={() => {
+                classQuery.refetch();
+                nav.refresh();
+              }}
+              projectId={project._id}
+            />
           </div>
         </div>
       )}

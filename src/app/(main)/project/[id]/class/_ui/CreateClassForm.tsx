@@ -28,7 +28,13 @@ const ClassSchema: ObjectSchema<ClassState> = object({
     .matches(/^[a-zA-Z ,]+$/),
 });
 
-export const CreateClassForm = ({ projectId }: { projectId: string }) => {
+export const CreateClassForm = ({
+  projectId,
+  onSuccess,
+}: {
+  projectId: string;
+  onSuccess?: () => void;
+}) => {
   const { register, handleSubmit } = useValidatedForm({
     schema: ClassSchema,
     defaultValues: {
@@ -54,6 +60,7 @@ export const CreateClassForm = ({ projectId }: { projectId: string }) => {
   const onSubmit = async (data: ClassState) => {
     try {
       await mutateAsync(data);
+      onSuccess?.();
     } catch {
       //ignore
     }
