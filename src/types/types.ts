@@ -1,10 +1,11 @@
 export interface Project {
+  _id: string;
   project_id: string;
   name: string;
   description: string;
   modification_time: string;
-  files: File[];
-  files_meta_str: {
+  files: {
+    file_path: string;
     file_name: string;
     column_name: string;
   }[];

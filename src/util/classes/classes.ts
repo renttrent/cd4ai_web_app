@@ -4,7 +4,11 @@ import { axios } from "../axios";
 export const getClassesByProjectId = async (
   projectId: string
 ): Promise<Class[]> => {
-  return await axios.get("/class/{projectId}");
+  const res = await axios.get(`/class?project_id=${projectId}`);
+  if (res.status === 200) {
+    return res.data.body ?? [];
+  }
+  return [];
 };
 
 export const getClassById = async (classId: string): Promise<Class | null> => {
