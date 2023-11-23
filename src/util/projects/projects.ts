@@ -12,3 +12,9 @@ export const getProject = async (id: string) => {
 
   return res.data.body as Project;
 };
+
+export const createProject = async (data: any) => {
+  const res = await axios.post("/project", data);
+  console.log(res);
+  return res.data.body;
+};

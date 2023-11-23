@@ -25,6 +25,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
     "react-icons": "^4.11.0",
+    "react-papaparse": "^4.4.0",
     "react-query": "^3.39.3",
     "react-spinners": "^0.13.8",
     "tailwind-merge": "^2.0.0",

@@ -6,7 +6,7 @@ export default function Page({ params }: PageProps) {
   const projectId = params.id;
   if (!projectId) notFound();
   return (
-    <div className="max-w-xl">
+    <div>
       <CreateClassForm projectId={projectId} />
     </div>
   );

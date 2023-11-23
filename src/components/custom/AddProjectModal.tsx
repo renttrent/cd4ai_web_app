@@ -1,116 +1,114 @@
-import { Label } from "@radix-ui/react-label";
-import { MouseEventHandler, MutableRefObject, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
-import { IoIosCloseCircle } from "react-icons/io";
-import { Input } from "../ui/input";
-import { useValidatedForm } from "@/hooks/use-validated-form";
-import { ObjectSchema, object, string } from "yup";
-import { useMutation } from "@tanstack/react-query";
-import { Button } from "../ui/button";
-import { PulseLoader } from "react-spinners";
+"use client";
 
-interface ProjectState {
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { Button } from "@/components/ui/button";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AiFillFileAdd } from "react-icons/ai";
+import { useValidatedForm } from "@/hooks/use-validated-form";
+import { ObjectSchema, array, object, string } from "yup";
+import { useMutation } from "@tanstack/react-query";
+import { createProject } from "@/util/projects/projects";
+
+type FormState = {
   name: string;
   description: string;
-  files: string;
-}
+  files: Array<any>;
+};
 
-const ProjectSchema: ObjectSchema<ProjectState> = object({
+const FormSchema: ObjectSchema<FormState> = object({
   name: string().required(),
   description: string().required(),
-  files: string().required(),
+  files: array().required(),
 }).required();
 
-export const AddProjectModal = ({
-  onClose,
-}: {
-  onClose: MouseEventHandler<HTMLButtonElement>;
-}) => {
-  const modalRef = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
-
-  const { register, handleSubmit } = useValidatedForm({
-    schema: ProjectSchema,
-  });
-
+export function AddProjectButton() {
   const { mutateAsync, isPending, isSuccess, isError, error } = useMutation({
-    mutationFn: async (data: ProjectState) => {
-      // TODO
+    mutationFn: async (data: FormState) => {
+      const res = await createProject(data);
+      console.log(res.data);
     },
   });
 
-  const onSubmit = async (data: ProjectState) => {
+  const { register, handleSubmit } = useValidatedForm({
+    schema: FormSchema,
+  });
+
+  const onSubmit = async (data: FormState) => {
+    console.log("here");
     try {
-      await mutateAsync(data);
+      console.log(data);
+      // await mutateAsync(data);
     } catch {
       //ignore
     }
   };
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      //@ts-ignore
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        // @ts-ignore
-        onClose();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
-
-  return createPortal(
-    <div>
-      <div className="absolute top-0 left-0 w-screen h-screen bg-black/20" />
-      <div
-        ref={modalRef}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 shadow-xl w-1/2 rounded-lg"
-      >
-        <div className="relative w-full">
-          <button onClick={onClose} className="absolute right-4 top-2 text-xl">
-            <IoIosCloseCircle />
-          </button>
-          <div className="p-10">
-            <div className="font-bold text-xl">Add a Project</div>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-4 mt-10"
-            >
-              <Label className="sr-only" htmlFor="name">
-                Name
-              </Label>
-              <Input
-                {...register("name")}
-                id="email"
-                placeholder="Name"
-                type="text"
-                autoCapitalize="none"
-                autoCorrect="off"
-                // disabled={isPending}
-              />
-              <Label className="sr-only" htmlFor="description">
-                Description
-              </Label>
-              <Input
-                {...register("description")}
-                id="email"
-                placeholder="Description"
-                type="text"
-                autoCapitalize="none"
-                autoCorrect="off"
-                // disabled={isPending}
-              />
-              <Button disabled={isPending}>
-                {isPending && <PulseLoader size={7} color="white" />}
-                {!isPending && <span>Submit</span>}
-              </Button>
-            </form>
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="flex flex-row gap-2 items-center">
+          <AiFillFileAdd />
+          Add Project
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Project</DialogTitle>
+          <DialogDescription>
+            Add your project details here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input
+                  {...register("name")}
+                  id="name"
+                  className="col-span-3"
+                  disabled={isPending}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="username" className="text-right">
+                  Description
+                </Label>
+                <Input
+                  {...register("description")}
+                  id="description"
+                  className="col-span-3"
+                  disabled={isPending}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="files">Choose Files</Label>
+                <Input
+                  {...register("files")}
+                  id="files"
+                  type="file"
+                  accept=".txt,.csv"
+                  className="col-span-3"
+                  disabled={isPending}
+                  multiple
+                />
+              </div>
+            </div>
+            <Button>Save</Button>
           </div>
-        </div>
-      </div>
-    </div>,
-    document.body
+        </form>
+      </DialogContent>
+    </Dialog>
   );
-};
+}

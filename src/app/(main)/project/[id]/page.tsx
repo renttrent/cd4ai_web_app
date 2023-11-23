@@ -8,13 +8,14 @@ import { FaChevronRight } from "react-icons/fa";
 import { IoMdAddCircle } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import colors from "tailwindcss/colors";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Class } from "@/types/types";
 import ClassCard from "@/components/custom/ClassCard";
 import { getClassesByProjectId } from "@/util/classes/classes";
 import { CreateClassForm } from "./class/_ui/CreateClassForm";
 import { useRouter } from "next/navigation";
 import { XIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const Skeleton = () => {
   // TODO
@@ -46,8 +47,14 @@ const Page = ({
 
   const isLoading = projectQuery.isLoading || classQuery.isLoading;
 
-  const project = projectQuery.data;
-  const classes = classQuery.data ?? [];
+  const [project, setProject] = useState(projectQuery.data);
+  const [classes, setClasses] = useState(classQuery.data ?? []);
+
+  useEffect(() => {
+    setProject(projectQuery.data);
+    setClasses(classQuery.data ?? []);
+  }, [projectQuery, classQuery]);
+
   if (isLoading) {
     return <Skeleton />;
   }
@@ -55,6 +62,7 @@ const Page = ({
   if (!project) {
     return <div>Project not found</div>;
   }
+
   const formatDate = (d: string) => {
     const date = new Date(d)
       .toLocaleDateString("en-US", {
@@ -82,13 +90,17 @@ const Page = ({
 
   return (
     <div>
+      <div className="flex flex-row items-center gap-2 p-2 my-2 w-fit">
+        <Link href="/" className="font-bold">
+          Dashboard
+        </Link>
+        <FaChevronRight />
+        <Link href={`/project/${project?.project_id}`}>{project.name}</Link>
+      </div>
       <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row items-center gap-2 p-2 my-2 w-fit">
-          <Link href="/" className="font-bold">
-            Dashboard
-          </Link>
-          <FaChevronRight />
-          <Link href={`/project/${project?.project_id}`}>{project?.name}</Link>
+        <div className="flex flex-row items-center text-5xl mt-2 mb-4 gap-4">
+          <div className="font-light text-stone-500">Project:</div>
+          <div className="font-bold text-stone-900">{project?.name}</div>
         </div>
         <div className="flex flex-row items-center gap-4 font-bold">
           <button
@@ -104,22 +116,20 @@ const Page = ({
           </button>
         </div>
       </div>
-      <div className="text-stone-700">Description:</div>
-      <div className="text-stone-900 font-medium">{project?.description}</div>
-      <div className="text-stone-700">Files:</div>
-      <div className="flex flex-row gap-4">
-        {project?.files.map((file, index) => (
-          <div
-            key={index}
-            className={`flex flex-row items-center gap-2 text-xs mt-4 w-fit px-2 py-1 rounded-md border-2`}
-            style={{
-              borderColor: getColor(index),
-              color: getColor(index),
-            }}
-          >
-            {file.file_name}
+      <div className="flex flex-col gap-2">
+        <div className="italic text-stone-500">
+          Last Updated: {formatDate(project?.modification_time ?? "")}
+        </div>
+        <div className="text-stone-700">Description:</div>
+        <div className="text-stone-900 font-medium">{project.description}</div>
+        <div className="flex flex-row gap-2 my-2">
+          <div className="text-stone-700">Files:</div>
+          <div className="flex flex-row gap-4">
+            {project?.files.map((file: any, index: number) => (
+              <Badge key={index}>{file.file_name}</Badge>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
       {showCreateClass && (
         <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
@@ -140,7 +150,7 @@ const Page = ({
         </div>
       )}
       <div className="mt-8">
-        {classes.map((classItem, index) => (
+        {classes.map((classItem: any, index: number) => (
           <ClassCard key={index} classItem={classItem} />
         ))}
       </div>

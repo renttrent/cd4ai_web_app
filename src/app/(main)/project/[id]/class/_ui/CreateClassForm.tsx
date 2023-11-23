@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingButton } from "@/components/ui/loadingbutton";
@@ -7,8 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { createClass } from "@/util/classes/classes";
 import { useMutation } from "@tanstack/react-query";
-import { PulseLoader } from "react-spinners";
-import { ObjectSchema, array, object, string } from "yup";
+import { ObjectSchema, object, string } from "yup";
 
 interface ClassState {
   name: string;

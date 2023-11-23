@@ -16,6 +16,8 @@ import { checkTaskStatus } from "@/util/keyword-extraction/check-task-status";
 import { useStartKeywordsExtraction } from "../_hooks/use-keyword-extraction";
 import { useCallback, useState } from "react";
 import { useCancelTask } from "../_hooks/use-cancel_task";
+import { Link } from "lucide-react";
+import { FaChevronRight } from "react-icons/fa";
 
 const addTaskToLocalStorage = (classId: string, taskId: string) => {
   if (typeof window !== "undefined") {
@@ -133,7 +135,7 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
       <div className="flex flex-col gap-1">
         <h2 className="font-bold">Initial Keywords</h2>
         <div className="flex gap-2 text-xl">
-          {data?.init_keywords.map((keyword, index) => (
+          {data?.init_keywords.map((keyword: any, index: any) => (
             <Badge key={index} variant="outline">
               {keyword}
             </Badge>
@@ -198,7 +200,7 @@ const KeywordsSelector = ({
           {(extracted_keywords ?? []).map((keyword, index) => (
             <div key={index} className="flex gap-2 p-3 bg-gray-50">
               <Checkbox
-                onCheckedChange={(checked) => {
+                onCheckedChange={(checked: any) => {
                   if (checked) {
                     setValue("final_keywords", [...final_words, keyword]);
                   } else {
