@@ -3,11 +3,7 @@ export interface Project {
   name: string;
   description: string;
   modification_time: string;
-  files: {
-    // files should be path , it is different from files_meta_str
-    file_name: string;
-    column_name: string;
-  }[];
+  files: File[];
   files_meta_str: {
     file_name: string;
     column_name: string;
