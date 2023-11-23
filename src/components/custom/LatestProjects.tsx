@@ -10,29 +10,23 @@ import Link from "next/link";
 import { Project } from "@/types/types";
 
 export const LatestProjectsView = () => {
-  const [projects, setProjects] = useState<Array<Project>>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data, isSuccess, isLoading, isError } = useQuery({
+  const {
+    data: projects,
+    isSuccess,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["projects"],
     queryFn: getProjects,
   });
 
-  useEffect(() => {
-    if (isSuccess) {
-      setProjects(data as any);
-    }
-  }, [isSuccess]);
-
-  useEffect(() => {
-    const filteredProjects = projects.filter(
-      (project) =>
-        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    setProjects(filteredProjects);
-  }, [searchTerm]);
+  const filteredProjects = (projects ?? []).filter(
+    (project) =>
+      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="mt-10">
@@ -54,7 +48,7 @@ export const LatestProjectsView = () => {
         </div>
       )}
       <div className="grid grid-cols-3 gap-10 mt-4">
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <Link href={`/project/${project._id}`} key={project._id}>
             <ProjectCard project={project} />
           </Link>

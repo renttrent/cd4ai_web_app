@@ -170,7 +170,7 @@ const KeywordsSelector = ({
       final_keywords: final_keywords ?? [],
     },
   });
-  const { mutateAsync, isPending } = useUpdateClass();
+  const { mutateAsync, isPending, isSuccess } = useUpdateClass();
 
   const final_words = watch("final_keywords");
   const onSubmit = async ({ final_keywords }: { final_keywords: string[] }) => {
@@ -218,10 +218,11 @@ const KeywordsSelector = ({
           <div className="flex gap-1 items-center">
             <span className="text-2xl text-bold">Final Words</span>
 
-            <div>
+            <div className="flex gap-2 items-center">
               <LoadingButton isLoading={isPending} disabled={isPending}>
                 Update
               </LoadingButton>
+              {isSuccess && <span> Successfully Updated</span>}
             </div>
           </div>
           {final_words.map((keyword, index) => (
