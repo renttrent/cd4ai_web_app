@@ -36,7 +36,7 @@ export const createClass = async (
 };
 
 export const deleteClass = async (classId: string): Promise<void> => {
-  return await axios.delete("/class/{classId}");
+  return await axios.delete(`/class?class_id=${classId}`);
 };
 
 export const updateClass = async (

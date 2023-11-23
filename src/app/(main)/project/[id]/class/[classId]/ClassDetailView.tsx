@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { getClassById } from "@/util/classes/classes";
-import { useQuery } from "@tanstack/react-query";
+import { deleteClass, getClassById } from "@/util/classes/classes";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { BarLoader, PulseLoader } from "react-spinners";
 import { array, object, string } from "yup";
 import { useUpdateClass } from "../_hooks/use-update-class";
@@ -16,6 +16,13 @@ import { checkTaskStatus } from "@/util/keyword-extraction/check-task-status";
 import { useStartKeywordsExtraction } from "../_hooks/use-keyword-extraction";
 import { useCallback, useState } from "react";
 import { useCancelTask } from "../_hooks/use-cancel_task";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useRouter } from "next/navigation";
 
 const addTaskToLocalStorage = (classId: string, taskId: string) => {
   if (typeof window !== "undefined") {
@@ -42,6 +49,7 @@ enum ExtractionState {
 }
 
 export const ClassDetailView = ({ classId }: { classId: string }) => {
+  const nav = useRouter();
   const { data, isLoading } = useQuery({
     queryKey: ["class", classId],
     queryFn: async () => {
@@ -62,6 +70,16 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
       res == "SUCCESS" && removeTaskId();
       res == "SUCCESS" && window.location.reload();
       return res;
+    },
+  });
+
+  const { mutateAsync: deleteAsync } = useMutation({
+    mutationFn: async (classId: string) => {
+      const res = await deleteClass(classId);
+      return res;
+    },
+    onSuccess: () => {
+      nav.replace(`/project/${data?.project_id}`);
     },
   });
 
@@ -104,7 +122,28 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
       <div className="flex gap-2 justify-between flex-wrap">
         <h1 className="text-3xl">{data?.name}</h1>
         <div className="flex gap-2 ">
-          <Button variant="destructive">Delete</Button>
+          <Popover>
+            <PopoverTrigger>
+              <Button variant="destructive">Delete</Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="flex flex-col gap-4 p-2">
+                <span className="font-semibold">
+                  Are you sure you want to delete this class?
+                </span>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    onClick={() => deleteAsync(classId)}
+                    variant="destructive"
+                  >
+                    Delete
+                  </Button>
+
+                  <Button variant="outline">Cancel</Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           {extractionState == ExtractionState.NOT_STARTED ? (
             <Button onClick={() => mutateAsync({ classId: classId })}>
               Start Keyword Extraction
@@ -164,6 +203,8 @@ const KeywordsSelector = ({
   final_keywords,
   class: cl,
 }: KeywordsSelectorProps) => {
+  const { toast } = useToast();
+
   const { handleSubmit, watch, setValue } = useValidatedForm({
     schema: KeywordsSchema,
     defaultValues: {
@@ -175,16 +216,19 @@ const KeywordsSelector = ({
   const final_words = watch("final_keywords");
   const onSubmit = async ({ final_keywords }: { final_keywords: string[] }) => {
     const { _id, ...rest } = cl ?? {};
-    return (
-      cl?._id &&
+    cl?._id &&
       (await mutateAsync({
         classId: cl._id,
         classData: {
           ...rest,
           final_keywords: final_keywords,
         },
-      }))
-    );
+      }));
+
+    toast({
+      title: "Successfully updated",
+      description: "The keywords have been updated",
+    });
   };
 
   if (!cl) {
@@ -222,7 +266,6 @@ const KeywordsSelector = ({
               <LoadingButton isLoading={isPending} disabled={isPending}>
                 Update
               </LoadingButton>
-              {isSuccess && <span> Successfully Updated</span>}
             </div>
           </div>
           {final_words.map((keyword, index) => (
