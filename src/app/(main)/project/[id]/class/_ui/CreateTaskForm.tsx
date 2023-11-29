@@ -110,7 +110,6 @@ export const CreateTaskForm = ({
   const onSubmit = async (data: TaskCreationState) => {
     try {
       await mutateAsync(data);
-      onSuccess?.();
     } catch {
       //ignore
     }
