@@ -116,7 +116,7 @@ const Page = ({
             <CreateClassForm
               onSuccess={() => {
                 classQuery.refetch();
-                nav.refresh();
+                setShowCreateClass(false);
               }}
               projectId={project.id}
             />

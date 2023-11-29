@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { getClassById } from "@/util/classes/classes";
-import { useQuery } from "@tanstack/react-query";
+import { deleteClass, getClassById } from "@/util/classes/classes";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { BarLoader, PulseLoader } from "react-spinners";
 import { array, object, string } from "yup";
 import { useUpdateClass } from "../_hooks/use-update-class";
@@ -237,17 +237,16 @@ const KeywordsSelector = ({
 
   const final_words = watch("final_keywords");
   const onSubmit = async ({ final_keywords }: { final_keywords: string[] }) => {
-    const { id, ...rest } = cl ?? {};
-    return (
-      cl?.id &&
-      (await mutateAsync({
-        classId: cl.id,
-        classData: {
-          ...rest,
-          final_keywords: final_keywords,
-        },
-      }))
-    );
+    // const { id, ...rest } = cl ?? {};
+    // return (
+    //   cl?.id &&
+    //   (await mutateAsync({
+    //     classId: cl.id,
+    //     classData: {
+    //       ...rest,
+    //       final_keywords: final_keywords,
+    //     },
+    //   }));
   };
 
   if (!cl) {
