@@ -10,8 +10,6 @@ export const Header = () => {
 
   useEffect(() => {
     setUser(session.data?.user);
-    console.log(session.data);
-    console.log(user);
   }, [session]);
 
   return (

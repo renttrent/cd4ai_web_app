@@ -69,7 +69,6 @@ export function AddProjectButton() {
       const file = CSVs[index];
       metaStrList.push({
         file_name: file.name,
-        column_name: selectedColumn,
       });
     }
     return metaStrList;
@@ -120,27 +119,21 @@ export function AddProjectButton() {
     });
   }, [content]);
 
-  const getColumns = () => {
-    CSVs.map((file) => {
-      const reader = new FileReader();
-      reader.onloadend = (event) => {
-        setContent((prev) => [...prev, event.target?.result as string]);
-      };
-      reader.readAsText(file);
-    });
-  };
+  // const getColumns = () => {
+  //   CSVs.map((file) => {
+  //     const reader = new FileReader();
+  //     reader.onloadend = (event) => {
+  //       setContent((prev) => [...prev, event.target?.result as string]);
+  //     };
+  //     reader.readAsText(file);
+  //   });
+  // };
 
-  useEffect(() => {
-    if (CSVs.length > 0) {
-      getColumns();
-    }
-  }, [CSVs]);
-
-  const [selectedColumn, setSelectedColumn] = useState<Array<string>>([]);
-
-  console.log("csvs", CSVs);
-  console.log("columns", columns);
-  console.log("selectedColumn", selectedColumn);
+  // useEffect(() => {
+  //   if (CSVs.length > 0) {
+  //     getColumns();
+  //   }
+  // }, [CSVs]);
 
   return (
     <Dialog>
@@ -197,7 +190,7 @@ export function AddProjectButton() {
                   multiple
                 />
               </div>
-              {CSVs.length > 0 && (
+              {/* {CSVs.length > 0 && (
                 <div className="flex flex-col gap-2">
                   <Label className="font-bold">
                     Choose a column for each file
@@ -233,8 +226,8 @@ export function AddProjectButton() {
                       </Select>
                     </div>
                   ))}
-                </div>
-              )}
+                </div> 
+              )}*/}
             </div>
             <Button type="submit">Save</Button>
           </div>
