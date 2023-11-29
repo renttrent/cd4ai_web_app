@@ -1,5 +1,5 @@
 export interface Project {
-  _id: string;
+  id: string;
   project_id: string;
   name: string;
   description: string;
@@ -11,14 +11,14 @@ export interface Project {
   }[];
 }
 export interface Class {
-  _id: string;
+  id: string;
   name: string;
-  short_description: string;
-  long_description: string;
+  description: string;
   project_id: string;
   init_keywords: string[];
   extracted_keywords: string[];
   final_keywords: string[];
   creation_date: string; // Example, should match your API response structure
   is_favorite: boolean; // Whether the class is a favorite for the user
+  modification_time: string;
 }

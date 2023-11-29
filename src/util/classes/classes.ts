@@ -22,11 +22,7 @@ export const getClassById = async (classId: string): Promise<Class | null> => {
 
 type CreateClassParams = Pick<
   Class,
-  | "name"
-  | "short_description"
-  | "long_description"
-  | "project_id"
-  | "init_keywords"
+  "name" | "description" | "project_id" | "init_keywords"
 >;
 
 export const createClass = async (

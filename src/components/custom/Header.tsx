@@ -2,10 +2,17 @@
 
 import { useSession } from "next-auth/react";
 import { AddProjectButton } from "./AddProjectModal";
+import { useEffect, useState } from "react";
 
 export const Header = () => {
   const session = useSession();
-  const user = session.data?.user;
+  const [user, setUser] = useState(session.data?.user);
+
+  useEffect(() => {
+    setUser(session.data?.user);
+    console.log(session.data);
+    console.log(user);
+  }, [session]);
 
   return (
     <div className="flex flex-row justify-between items-center">

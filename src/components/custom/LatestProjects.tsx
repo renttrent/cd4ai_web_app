@@ -7,17 +7,11 @@ import { getProjects } from "@/util/projects/projects";
 import { BarLoader } from "react-spinners";
 import colors from "tailwindcss/colors";
 import Link from "next/link";
-import { Project } from "@/types/types";
 
 export const LatestProjectsView = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const {
-    data: projects,
-    isSuccess,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: getProjects,
   });
@@ -49,7 +43,7 @@ export const LatestProjectsView = () => {
       )}
       <div className="grid grid-cols-3 gap-10 mt-4">
         {filteredProjects.map((project) => (
-          <Link href={`/project/${project._id}`} key={project._id}>
+          <Link href={`/project/${project.id}`} key={project.id}>
             <ProjectCard project={project} />
           </Link>
         ))}

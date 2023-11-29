@@ -14,10 +14,21 @@ import { LoadingButton } from "@/components/ui/loadingbutton";
 import { Class } from "@/types/types";
 import { checkTaskStatus } from "@/util/keyword-extraction/check-task-status";
 import { useStartKeywordsExtraction } from "../_hooks/use-keyword-extraction";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useCancelTask } from "../_hooks/use-cancel_task";
-import { Link } from "lucide-react";
 import { FaChevronRight } from "react-icons/fa";
+import { formatDate, shortFormatDate } from "@/lib/utils";
+import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Task, getTasks } from "@/util/keyword-extraction/tasks";
 
 const addTaskToLocalStorage = (classId: string, taskId: string) => {
   if (typeof window !== "undefined") {
@@ -67,6 +78,22 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
     },
   });
 
+  const [taskList, setTaskList] = useState<Task[]>([]);
+
+  const { data: taskListData, refetch: taskListRefetch } = useQuery({
+    queryKey: ["taskList", taskList],
+    queryFn: async () => {
+      if (data?.id) {
+        const res = await getTasks(data?.id);
+        return res;
+      }
+    },
+  });
+
+  useEffect(() => {
+    taskListRefetch();
+  }, [data]);
+
   const removeTaskId = () => {
     setTaskId(null);
     removeTaskFromLocalStorage(classId);
@@ -100,12 +127,25 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
     ? ExtractionState.IN_PROGRESS
     : ExtractionState.NOT_STARTED;
 
-  console.log(extractionState);
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2 justify-between flex-wrap">
-        <h1 className="text-3xl">{data?.name}</h1>
-        <div className="flex gap-2 ">
+    <div>
+      <div className="flex flex-row items-center gap-2 p-2 my-2 w-fit">
+        <Link href="/" className="font-bold">
+          Dashboard
+        </Link>
+        <FaChevronRight />
+        <Link href={`/project/${data?.project_id}`}>Project</Link>
+        <FaChevronRight />
+        <Link href={`/project/${data?.project_id}/class/${data?.id}`}>
+          {data?.name}
+        </Link>
+      </div>
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-row items-center text-5xl mt-2 mb-4 gap-4">
+          <div className="font-light text-stone-500">Class:</div>
+          <div className="font-bold text-stone-900">{data?.name}</div>
+        </div>
+        <div className="flex gap-2">
           <Button variant="destructive">Delete</Button>
           {extractionState == ExtractionState.NOT_STARTED ? (
             <Button onClick={() => mutateAsync({ classId: classId })}>
@@ -124,30 +164,51 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
           ) : null}
         </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <h2 className="font-bold">Short Description</h2>
-        <p>{data?.short_description}</p>
-      </div>
-      <div className="flex flex-col gap-1">
-        <h2 className="font-bold">Long Description</h2>
-        <p>{data?.long_description}</p>
-      </div>
-      <div className="flex flex-col gap-1">
-        <h2 className="font-bold">Initial Keywords</h2>
-        <div className="flex gap-2 text-xl">
-          {data?.init_keywords.map((keyword: any, index: any) => (
-            <Badge key={index} variant="outline">
-              {keyword}
-            </Badge>
-          ))}
+      <div className="flex flex-col gap-2">
+        <div className="italic text-stone-500">
+          Last Updated: {formatDate(data?.modification_time ?? "")}
         </div>
+        <div className="text-stone-700">Description:</div>
+        <div className="text-stone-900 font-medium">{data?.description}</div>
       </div>
-
-      <KeywordsSelector
-        class={data}
-        extracted_keywords={data?.extracted_keywords}
-        final_keywords={data?.final_keywords}
-      />
+      {taskListData && taskListData?.length > 0 && (
+        <div className="mt-4">
+          <div className="font-bold text-center my-4 text-lg">
+            Tasks and Snapshots
+          </div>
+          <Table>
+            <TableCaption>Your recent tasks.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Initial Keywords</TableHead>
+                <TableHead>Extracted Keywords</TableHead>
+                <TableHead className="text-right">Start Time</TableHead>
+                <TableHead className="text-right">End Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {taskListData.map((task, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{task.type}</TableCell>
+                  <TableCell>{task.status}</TableCell>
+                  <TableCell>{task.input.init_keywords.toString()}</TableCell>
+                  <TableCell>
+                    {task.result?.extracted_keywords.toString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {shortFormatDate(task.start_time)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {shortFormatDate(task.end_time)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 };
@@ -176,11 +237,11 @@ const KeywordsSelector = ({
 
   const final_words = watch("final_keywords");
   const onSubmit = async ({ final_keywords }: { final_keywords: string[] }) => {
-    const { _id, ...rest } = cl ?? {};
+    const { id, ...rest } = cl ?? {};
     return (
-      cl?._id &&
+      cl?.id &&
       (await mutateAsync({
-        classId: cl._id,
+        classId: cl.id,
         classData: {
           ...rest,
           final_keywords: final_keywords,
@@ -224,7 +285,7 @@ const KeywordsSelector = ({
               <LoadingButton isLoading={isPending} disabled={isPending}>
                 Update
               </LoadingButton>
-              {isSuccess && <span> Successfully Updated</span>}
+              {isSuccess && <span>Successfully Updated</span>}
             </div>
           </div>
           {final_words.map((keyword, index) => (

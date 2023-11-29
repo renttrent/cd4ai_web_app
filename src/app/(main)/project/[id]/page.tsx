@@ -7,15 +7,14 @@ import { BarLoader } from "react-spinners";
 import { FaChevronRight } from "react-icons/fa";
 import { IoMdAddCircle } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
-import colors from "tailwindcss/colors";
-import { use, useEffect, useState } from "react";
-import { Class } from "@/types/types";
+import { useEffect, useState } from "react";
 import ClassCard from "@/components/custom/ClassCard";
 import { getClassesByProjectId } from "@/util/classes/classes";
 import { CreateClassForm } from "./class/_ui/CreateClassForm";
 import { useRouter } from "next/navigation";
 import { XIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
 
 const Skeleton = () => {
   // TODO
@@ -63,31 +62,6 @@ const Page = ({
     return <div>Project not found</div>;
   }
 
-  const formatDate = (d: string) => {
-    const date = new Date(d)
-      .toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-      })
-      .split(" ")
-      .join(" ");
-    return date;
-  };
-
-  const getColor = (index: number) => {
-    const availableColors = [
-      colors.rose[500],
-      colors.teal[500],
-      colors.cyan[500],
-      colors.lime[500],
-    ];
-
-    return availableColors[index % availableColors.length];
-  };
-
   return (
     <div>
       <div className="flex flex-row items-center gap-2 p-2 my-2 w-fit">
@@ -95,7 +69,7 @@ const Page = ({
           Dashboard
         </Link>
         <FaChevronRight />
-        <Link href={`/project/${project?.project_id}`}>{project.name}</Link>
+        <Link href={`/project/${project?.id}`}>{project.name}</Link>
       </div>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center text-5xl mt-2 mb-4 gap-4">
@@ -144,7 +118,7 @@ const Page = ({
                 classQuery.refetch();
                 nav.refresh();
               }}
-              projectId={project._id}
+              projectId={project.id}
             />
           </div>
         </div>

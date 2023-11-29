@@ -18,24 +18,40 @@ import { useValidatedForm } from "@/hooks/use-validated-form";
 import { ObjectSchema, array, object, string } from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { createProject } from "@/util/projects/projects";
+import { useEffect, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { usePapaParse } from "react-papaparse";
+import { Project } from "@/types/types";
 
 type FormState = {
   name: string;
   description: string;
-  files: Array<any>;
 };
 
 const FormSchema: ObjectSchema<FormState> = object({
   name: string().required(),
   description: string().required(),
-  files: array().required(),
 }).required();
 
 export function AddProjectButton() {
+  const [newProject, setNewProject] = useState<Project>();
+
   const { mutateAsync, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (data: FormState) => {
-      const res = await createProject(data);
-      console.log(res.data);
+      const { name, description } = data;
+      const res = await createProject({
+        name,
+        description,
+        files: fileList,
+        files_meta_str: generateMetaStrList(),
+      });
+      setNewProject(res);
     },
   });
 
@@ -43,15 +59,89 @@ export function AddProjectButton() {
     schema: FormSchema,
   });
 
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [fileList, setFileList] = useState<File[]>([]);
+  const [CSVs, setCSVs] = useState<File[]>([]);
+
+  const generateMetaStrList = () => {
+    const metaStrList = [];
+    for (let index = 0; index < CSVs.length; index++) {
+      const file = CSVs[index];
+      metaStrList.push({
+        file_name: file.name,
+        column_name: selectedColumn,
+      });
+    }
+    return metaStrList;
+  };
+
+  useEffect(() => {
+    if (files) {
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        fileList.push(file);
+        if (file.type === "text/csv") {
+          setCSVs((prev) => [...prev, file]);
+        }
+      }
+    }
+  }, [files]);
+
   const onSubmit = async (data: FormState) => {
-    console.log("here");
     try {
-      console.log(data);
-      // await mutateAsync(data);
+      await mutateAsync(data);
     } catch {
       //ignore
     }
   };
+
+  const { readString } = usePapaParse();
+  const [content, setContent] = useState<string[]>([]);
+  const [columns, setColumns] = useState<Array<Array<string>>>([]);
+
+  useEffect(() => {
+    content.map((text, index) => {
+      readString(text, {
+        worker: true,
+        complete: (results: any) => {
+          if (results.data[0]) {
+            setColumns((prev) => {
+              const newCols = [...prev];
+              if (newCols[index]) {
+                newCols[index] = results.data[0];
+              } else {
+                newCols.push(results.data[0]);
+              }
+              return newCols;
+            });
+          }
+        },
+      });
+    });
+  }, [content]);
+
+  const getColumns = () => {
+    CSVs.map((file) => {
+      const reader = new FileReader();
+      reader.onloadend = (event) => {
+        setContent((prev) => [...prev, event.target?.result as string]);
+      };
+      reader.readAsText(file);
+    });
+  };
+
+  useEffect(() => {
+    if (CSVs.length > 0) {
+      getColumns();
+    }
+  }, [CSVs]);
+
+  const [selectedColumn, setSelectedColumn] = useState<Array<string>>([]);
+
+  console.log("csvs", CSVs);
+  console.log("columns", columns);
+  console.log("selectedColumn", selectedColumn);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -95,17 +185,58 @@ export function AddProjectButton() {
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="files">Choose Files</Label>
                 <Input
-                  {...register("files")}
                   id="files"
                   type="file"
                   accept=".txt,.csv"
                   className="col-span-3"
                   disabled={isPending}
+                  onChange={(e) => {
+                    // @ts-ignore
+                    setFiles(e.target.files);
+                  }}
                   multiple
                 />
               </div>
+              {CSVs.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <Label className="font-bold">
+                    Choose a column for each file
+                  </Label>
+                  {CSVs.map((file, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-4 items-center gap-4"
+                    >
+                      <Label htmlFor="files">{file.name}</Label>
+                      <Select
+                        name="column"
+                        id="column"
+                        defaultValue={selectedColumn[index]}
+                        onChange={(e: any) =>
+                          setSelectedColumn((prev) => {
+                            prev[index] = e.target.value;
+                            return prev;
+                          })
+                        }
+                      >
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Choose column" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {columns.length > 0 &&
+                            columns[index].map((column, index) => (
+                              <SelectItem key={index} value={column}>
+                                {column}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <Button>Save</Button>
+            <Button type="submit">Save</Button>
           </div>
         </form>
       </DialogContent>

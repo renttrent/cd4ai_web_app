@@ -1,5 +1,5 @@
 import { http } from "@/server/api/http";
-import NextAuth, { Session } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const handler = NextAuth({
@@ -36,13 +36,13 @@ const handler = NextAuth({
             });
 
             return {
-              ...res.data,
-              id: res.data?._id,
+              ...res.data.body,
               server_token: token,
             };
           }
           return null;
         } catch (e) {
+          console.log(e);
           return null;
         }
       },

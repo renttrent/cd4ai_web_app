@@ -14,7 +14,10 @@ export const getProject = async (id: string) => {
 };
 
 export const createProject = async (data: any) => {
-  const res = await axios.post("/project", data);
-  console.log(res);
+  const res = await axios.post("/project", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return res.data.body;
 };
