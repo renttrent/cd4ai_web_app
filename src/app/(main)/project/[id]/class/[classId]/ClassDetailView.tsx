@@ -1,19 +1,17 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { deleteClass, getClassById } from "@/util/classes/classes";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { getClassById } from "@/util/classes/classes";
+import { useQuery } from "@tanstack/react-query";
 import { BarLoader, PulseLoader } from "react-spinners";
 import { array, object, string } from "yup";
 import { useUpdateClass } from "../_hooks/use-update-class";
 import { LoadingButton } from "@/components/ui/loadingbutton";
 import { Class } from "@/types/types";
-import { checkTaskStatus } from "@/util/keyword-extraction/check-task-status";
-import { useStartKeywordsExtraction } from "../_hooks/use-keyword-extraction";
+import { checkTaskStatus } from "@/util/task/check-task-status";
 import { useCallback, useEffect, useState } from "react";
 import { useCancelTask } from "../_hooks/use-cancel_task";
 import { FaChevronRight } from "react-icons/fa";
@@ -28,7 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Task, getTasks } from "@/util/keyword-extraction/tasks";
+import { Task, getTasks } from "@/util/task/tasks";
+import { Modal } from "@/components/custom/Modal";
+import { CreateTaskForm } from "../_ui/CreateTaskForm";
 
 const addTaskToLocalStorage = (classId: string, taskId: string) => {
   if (typeof window !== "undefined") {
@@ -99,23 +99,21 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
     removeTaskFromLocalStorage(classId);
   };
 
-  const onKeywordsExtractionSuccessCallback = useCallback(
-    (res: { task_id: string | null }) => {
-      setTaskId(res.task_id);
-      res.task_id && addTaskToLocalStorage(classId, res.task_id);
-    },
-    []
-  );
-
-  const { mutateAsync } = useStartKeywordsExtraction(
-    onKeywordsExtractionSuccessCallback
-  );
+  // const onKeywordsExtractionSuccessCallback = useCallback(
+  //   (res: { task_id: string | null }) => {
+  //     setTaskId(res.task_id);
+  //     res.task_id && addTaskToLocalStorage(classId, res.task_id);
+  //   },
+  //   []
+  // );
 
   const { mutateAsync: stopKeywordsExtraction } = useCancelTask(() =>
     removeTaskId()
   );
 
   const taskInProgress = taskStatus == "STARTED";
+
+  const [isCreateTaskFormOpen, setIsCreateTaskFormOpen] = useState(false);
 
   if (isLoading || taskInProgress == undefined) {
     return <BarLoader width="100%" className="mt-4" />;
@@ -126,7 +124,6 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
     : taskInProgress
     ? ExtractionState.IN_PROGRESS
     : ExtractionState.NOT_STARTED;
-
   return (
     <div>
       <div className="flex flex-row items-center gap-2 p-2 my-2 w-fit">
@@ -148,7 +145,7 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
         <div className="flex gap-2">
           <Button variant="destructive">Delete</Button>
           {extractionState == ExtractionState.NOT_STARTED ? (
-            <Button onClick={() => mutateAsync({ classId: classId })}>
+            <Button onClick={() => setIsCreateTaskFormOpen(true)}>
               Start Keyword Extraction
             </Button>
           ) : extractionState == ExtractionState.IN_PROGRESS ? (
@@ -209,6 +206,21 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
           </Table>
         </div>
       )}
+
+      <Modal
+        open={isCreateTaskFormOpen}
+        onClose={() => setIsCreateTaskFormOpen(false)}
+      >
+        {data && (
+          <CreateTaskForm
+            onSuccess={() => {
+              setIsCreateTaskFormOpen(false);
+              taskListRefetch();
+            }}
+            class={data}
+          />
+        )}
+      </Modal>
     </div>
   );
 };

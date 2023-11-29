@@ -1,5 +1,5 @@
-import { cancelTask } from "@/util/keyword-extraction/cancel-task";
-import { TaskStatus } from "@/util/keyword-extraction/check-task-status";
+import { cancelTask } from "@/util/task/cancel-task";
+import { TaskStatus } from "@/util/task/check-task-status";
 import { useMutation } from "@tanstack/react-query";
 
 export const useCancelTask = (onSuccess: (data: boolean) => void) => {

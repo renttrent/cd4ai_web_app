@@ -1,7 +1,4 @@
-import {
-  TaskStatus,
-  checkTaskStatus,
-} from "@/util/keyword-extraction/check-task-status";
+import { TaskStatus, checkTaskStatus } from "@/util/task/check-task-status";
 import { useMutation } from "@tanstack/react-query";
 
 export const useTaskStatus = (onSuccess: (data: TaskStatus) => void) => {
