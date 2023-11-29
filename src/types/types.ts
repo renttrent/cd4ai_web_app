@@ -15,7 +15,6 @@ export interface Class {
   name: string;
   description: string;
   project_id: string;
-  init_keywords: string[];
   extracted_keywords: string[];
   final_keywords: string[];
   creation_date: string; // Example, should match your API response structure

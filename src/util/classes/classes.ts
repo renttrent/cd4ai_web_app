@@ -20,15 +20,16 @@ export const getClassById = async (classId: string): Promise<Class | null> => {
   return null;
 };
 
-type CreateClassParams = Pick<
-  Class,
-  "name" | "description" | "project_id" | "init_keywords"
->;
+type CreateClassParams = Pick<Class, "name" | "description" | "project_id">;
 
 export const createClass = async (
   classData: CreateClassParams
 ): Promise<Class> => {
-  return await axios.post("/class", classData);
+  return await axios.post("/class", classData, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
 };
 
 export const deleteClass = async (classId: string): Promise<void> => {

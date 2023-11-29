@@ -10,20 +10,14 @@ import { ObjectSchema, object, string } from "yup";
 
 interface ClassState {
   name: string;
-  short_description: string;
-  long_description: string;
+  description: string;
   project_id: string;
-  init_keywords: string;
 }
 
 const ClassSchema: ObjectSchema<ClassState> = object({
   name: string().required(),
-  short_description: string().required(),
-  long_description: string().required(),
+  description: string().required(),
   project_id: string().required(),
-  init_keywords: string()
-    .required()
-    .matches(/^[a-zA-Z ,]+$/),
 });
 
 export const CreateClassForm = ({
@@ -42,16 +36,7 @@ export const CreateClassForm = ({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: ClassState) => {
-      const { init_keywords, ...rest } = data;
-
-      const keywords = init_keywords
-        .split(",")
-        .map((keyword) => keyword.trim());
-      const classData = {
-        ...rest,
-        init_keywords: keywords,
-      };
-      return createClass(classData);
+      return createClass(data);
     },
   });
 
@@ -64,7 +49,7 @@ export const CreateClassForm = ({
     }
   };
   return (
-    <div className="p-10">
+    <div className="">
       <div className="font-bold text-xl">Add a Class</div>
       <form
         onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
@@ -80,21 +65,12 @@ export const CreateClassForm = ({
           autoCorrect="off"
           // disabled={isPending}
         />
-        <Label htmlFor="short_description">Short Description</Label>
-        <Input
-          {...register("short_description")}
-          id="short_description"
-          placeholder="Short Description"
-          type="text"
-          autoCapitalize="none"
-          autoCorrect="off"
-          // disabled={isPending}
-        />
-        <Label htmlFor="long_description">Long Description</Label>
+
+        <Label htmlFor="description">Description</Label>
         <Textarea
-          {...register("long_description")}
-          id="long_description"
-          placeholder="Long Description"
+          {...register("description")}
+          id="description"
+          placeholder="Description "
           autoCapitalize="none"
           autoCorrect="off"
           // disabled={isPending}
@@ -108,17 +84,6 @@ export const CreateClassForm = ({
           id="project_id"
           className="hidden"
           placeholder="Project ID"
-          type="text"
-          autoCapitalize="none"
-          autoCorrect="off"
-          // disabled={isPending}
-        />
-        <Label htmlFor="init_keywords">Initial Keywords</Label>
-
-        <Input
-          {...register("init_keywords")}
-          id="init_keywords"
-          placeholder="Initial Keywords"
           type="text"
           autoCapitalize="none"
           autoCorrect="off"

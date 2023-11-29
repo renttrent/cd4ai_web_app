@@ -1,33 +1,17 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
 import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AiFillFileAdd } from "react-icons/ai";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { ObjectSchema, array, object, string } from "yup";
+import { ObjectSchema, object, string } from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { createProject } from "@/util/projects/projects";
-import { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { usePapaParse } from "react-papaparse";
-import { Project } from "@/types/types";
+import { useState } from "react";
+import { Modal } from "./Modal";
+import { queryClient } from "@/util/query-client";
 
 type FormState = {
   name: string;
@@ -40,18 +24,19 @@ const FormSchema: ObjectSchema<FormState> = object({
 }).required();
 
 export function AddProjectButton() {
-  const [newProject, setNewProject] = useState<Project>();
-
   const { mutateAsync, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (data: FormState) => {
       const { name, description } = data;
       const res = await createProject({
         name,
         description,
-        files: fileList,
-        files_meta_str: generateMetaStrList(),
+        files,
+        // files_meta_str: generateMetaStrList(),
       });
-      setNewProject(res);
+    },
+    onSuccess: () => {
+      setIsOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 
@@ -59,8 +44,7 @@ export function AddProjectButton() {
     schema: FormSchema,
   });
 
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [fileList, setFileList] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[] | null>(null);
   const [CSVs, setCSVs] = useState<File[]>([]);
 
   const generateMetaStrList = () => {
@@ -74,17 +58,17 @@ export function AddProjectButton() {
     return metaStrList;
   };
 
-  useEffect(() => {
-    if (files) {
-      for (let index = 0; index < files.length; index++) {
-        const file = files[index];
-        fileList.push(file);
-        if (file.type === "text/csv") {
-          setCSVs((prev) => [...prev, file]);
-        }
-      }
-    }
-  }, [files]);
+  // useEffect(() => {
+  //   if (files) {
+  //     for (let index = 0; index < files.length; index++) {
+  //       const file = files[index];
+  //       fileList.push(file);
+  //       if (file.type === "text/csv") {
+  //         setCSVs((prev) => [...prev, file]);
+  //       }
+  //     }
+  //   }
+  // }, [files]);
 
   const onSubmit = async (data: FormState) => {
     try {
@@ -94,30 +78,30 @@ export function AddProjectButton() {
     }
   };
 
-  const { readString } = usePapaParse();
-  const [content, setContent] = useState<string[]>([]);
-  const [columns, setColumns] = useState<Array<Array<string>>>([]);
+  // const { readString } = usePapaParse();
+  // const [content, setContent] = useState<string[]>([]);
+  // const [columns, setColumns] = useState<Array<Array<string>>>([]);
 
-  useEffect(() => {
-    content.map((text, index) => {
-      readString(text, {
-        worker: true,
-        complete: (results: any) => {
-          if (results.data[0]) {
-            setColumns((prev) => {
-              const newCols = [...prev];
-              if (newCols[index]) {
-                newCols[index] = results.data[0];
-              } else {
-                newCols.push(results.data[0]);
-              }
-              return newCols;
-            });
-          }
-        },
-      });
-    });
-  }, [content]);
+  // useEffect(() => {
+  //   content.map((text, index) => {
+  //     readString(text, {
+  //       worker: true,
+  //       complete: (results: any) => {
+  //         if (results.data[0]) {
+  //           setColumns((prev) => {
+  //             const newCols = [...prev];
+  //             if (newCols[index]) {
+  //               newCols[index] = results.data[0];
+  //             } else {
+  //               newCols.push(results.data[0]);
+  //             }
+  //             return newCols;
+  //           });
+  //         }
+  //       },
+  //     });
+  //   });
+  // }, [content]);
 
   // const getColumns = () => {
   //   CSVs.map((file) => {
@@ -135,21 +119,26 @@ export function AddProjectButton() {
   //   }
   // }, [CSVs]);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="flex flex-row gap-2 items-center">
-          <AiFillFileAdd />
-          Add Project
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add Project</DialogTitle>
-          <DialogDescription>
-            Add your project details here. Click save when you're done.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Button
+        onClick={() => setIsOpen(true)}
+        variant="outline"
+        className="flex flex-row gap-2 items-center"
+      >
+        <AiFillFileAdd />
+        Add Project
+      </Button>
+      <Modal
+        className="max-w-sm"
+        open={isOpen}
+        title="Add Project"
+        description="Add your project details here. Click save when you're done.
+      "
+        onClose={() => setIsOpen(false)}
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <div className="grid gap-4 py-4">
@@ -185,7 +174,14 @@ export function AddProjectButton() {
                   disabled={isPending}
                   onChange={(e) => {
                     // @ts-ignore
-                    setFiles(e.target.files);
+                    const length = e.target.files.length;
+
+                    let files = [];
+                    for (let index = 0; index < length; index++) {
+                      // @ts-ignore
+                      files.push(e.target.files[index]);
+                    }
+                    setFiles(files);
                   }}
                   multiple
                 />
@@ -232,7 +228,7 @@ export function AddProjectButton() {
             <Button type="submit">Save</Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </Modal>
+    </>
   );
 }

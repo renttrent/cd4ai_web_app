@@ -1,6 +1,7 @@
 "use client";
 
 import { Toaster } from "@/components/ui/toaster";
+import { queryClient } from "@/util/query-client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
@@ -14,12 +15,12 @@ export const ClientRoot = ({
   children,
   session,
 }: { session?: Session | null } & PropsWithChildren) => {
-  const [queryClient] = useState(() => new QueryClient());
+  const [q] = useState(queryClient);
 
   return (
     <SessionProvider session={session}>
       <Toaster />
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={q}>{children}</QueryClientProvider>
     </SessionProvider>
   );
 };

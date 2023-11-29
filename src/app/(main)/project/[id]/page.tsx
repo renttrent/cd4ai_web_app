@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { XIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
+import { Modal } from "@/components/custom/Modal";
 
 const Skeleton = () => {
   // TODO
@@ -105,24 +106,21 @@ const Page = ({
           </div>
         </div>
       </div>
-      {showCreateClass && (
-        <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-4 rounded-md w-full mx-4 max-w-2xl">
-            <div className="flex flex-row-reverse">
-              <button onClick={() => setShowCreateClass(false)}>
-                <XIcon />
-              </button>
-            </div>
-            <CreateClassForm
-              onSuccess={() => {
-                classQuery.refetch();
-                setShowCreateClass(false);
-              }}
-              projectId={project.id}
-            />
-          </div>
-        </div>
-      )}
+
+      <Modal
+        className="max-w-xl"
+        open={showCreateClass}
+        onClose={() => setShowCreateClass(false)}
+      >
+        <CreateClassForm
+          onSuccess={() => {
+            classQuery.refetch();
+            setShowCreateClass(false);
+          }}
+          projectId={project.id}
+        />
+      </Modal>
+
       <div className="mt-8">
         {classes.map((classItem: any, index: number) => (
           <ClassCard key={index} classItem={classItem} />
