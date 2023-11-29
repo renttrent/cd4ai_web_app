@@ -122,7 +122,7 @@ export const CreateTaskForm = ({
   });
   return (
     <div className="">
-      <div className="font-bold text-xl">Add a Class</div>
+      <div className="font-bold text-xl">Start Keyword Extraction</div>
       <form
         onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
         className="flex flex-col gap-3 mt-10"
