@@ -7,6 +7,7 @@ export type Task = {
   status: "started" | "completed" | "cancelled";
   start_time: string;
   end_time: string;
+  valid: boolean;
   input: {
     files_to_consider: {
       file_path: string;
@@ -25,3 +26,14 @@ export const getTasks = async (classId: string) => {
 
   return res.data.body as Task[];
 };
+
+export const updateTask = async (taskId: string, data: any) => {
+  const res = await axios.put(`/task/${taskId}`, data);
+
+  return res.data.body as Task;
+};
+
+export type TaskResult = {
+  extracted_keywords: string[];
+  filtered_keywords: string[];
+} | null;
