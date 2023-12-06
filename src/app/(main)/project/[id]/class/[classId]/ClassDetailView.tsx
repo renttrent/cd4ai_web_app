@@ -176,6 +176,13 @@ const TaskAccordion = ({
   onClick: () => void;
   onChildrenClick?: (task: Task) => void;
 }) => {
+  const taskName = `Task 
+  ${task.input.init_keywords
+    .slice(0, 7)
+    .map((t) => t[0])
+    .join("")
+    .toUpperCase()}
+  -${index + 1}`;
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
@@ -187,13 +194,7 @@ const TaskAccordion = ({
                   <TaskButton
                     task={task}
                     selected={selected}
-                    name={`Task 
-                    ${task.input.init_keywords
-                      .slice(0, 7)
-                      .map((t) => t[0])
-                      .join("")
-                      .toUpperCase()}
-                    -${index + 1}`}
+                    name={taskName}
                     onClick={() => onClick()}
                   />
                 </AccordionTrigger>
@@ -212,6 +213,7 @@ const TaskAccordion = ({
         </div>
         <AccordionContent>
           <TaskChildrenList
+            taskName={taskName}
             onChildTaskClick={onChildrenClick}
             taskId={task.id}
           />
@@ -223,9 +225,11 @@ const TaskAccordion = ({
 
 const TaskChildrenList = ({
   taskId,
+  taskName,
   onChildTaskClick,
 }: {
   taskId: string;
+  taskName: string;
   onChildTaskClick?: (task: Task) => void;
 }) => {
   const { data } = useQuery({
@@ -244,10 +248,13 @@ const TaskChildrenList = ({
           <TaskButton
             task={task}
             selected={false}
-            name={`Task-CONTEXT-${index + 1}`}
+            name={taskName + "-SUBTASK-" + (index + 1).toString()}
             onClick={() =>
               onChildTaskClick &&
-              onChildTaskClick({ ...task, name: `Task-CONTEXT-${index + 1}` })
+              onChildTaskClick({
+                ...task,
+                name: taskName + "-SUBTASK-" + (index + 1).toString(),
+              })
             }
           />
         </div>
