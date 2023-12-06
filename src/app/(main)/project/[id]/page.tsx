@@ -16,6 +16,7 @@ import { XIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { Modal } from "@/components/custom/Modal";
+import { FileBadge } from "@/components/custom/FileBadge";
 
 const Skeleton = () => {
   // TODO
@@ -101,7 +102,11 @@ const Page = ({
           <div className="text-stone-700">Files:</div>
           <div className="flex flex-row gap-4">
             {project?.files.map((file: any, index: number) => (
-              <Badge key={index}>{file.file_name}</Badge>
+              <FileBadge
+                key={index}
+                name={file.file_name}
+                path={file.file_path}
+              />
             ))}
           </div>
         </div>

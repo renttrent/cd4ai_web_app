@@ -14,7 +14,7 @@ import { useFileDownload } from "@/hooks/use-file-download";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { Class, Project } from "@/types/types";
 import { getProject } from "@/util/projects/projects";
-import { startTask } from "@/util/task/start-task";
+import { TaskType, startTask } from "@/util/task/start-task";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { PlusIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ import { useFieldArray } from "react-hook-form";
 import { ObjectSchema, array, object, string } from "yup";
 import Papa from "papaparse";
 interface TaskCreationState {
-  type: "extraction";
+  type: "keywords extraction";
   input: {
     files_to_consider: {
       file_path: string;
@@ -33,7 +33,7 @@ interface TaskCreationState {
 }
 
 const TaskCreationSchema: ObjectSchema<TaskCreationState> = object({
-  type: string().oneOf(["extraction"]).required(),
+  type: string().oneOf(["keywords extraction"]).required(),
   input: object({
     files_to_consider: array(
       object({
@@ -61,7 +61,7 @@ export const CreateTaskForm = ({
     useValidatedForm({
       schema: TaskCreationSchema,
       defaultValues: {
-        type: "extraction",
+        type: "keywords extraction",
         input: {
           files_to_consider: [],
           init_keywords: "",
@@ -110,6 +110,7 @@ export const CreateTaskForm = ({
   const onSubmit = async (data: TaskCreationState) => {
     try {
       await mutateAsync(data);
+      onSuccess?.();
     } catch {
       //ignore
     }

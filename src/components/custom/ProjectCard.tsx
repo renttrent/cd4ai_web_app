@@ -1,6 +1,7 @@
 import { Project } from "@/types/types";
 import React from "react";
 import { AiFillFolderOpen } from "react-icons/ai";
+import { FileBadge } from "./FileBadge";
 
 interface ProjectCardProps {
   project: Project;

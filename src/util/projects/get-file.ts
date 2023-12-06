@@ -6,5 +6,5 @@ export const getFile = async (path: string) => {
   });
 
   const url = window.URL.createObjectURL(new Blob([res.data]));
-  return { url: url, blob: new Blob([res.data]) };
+  return { url: url, blob: res.data as Blob };
 };

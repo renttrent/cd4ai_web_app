@@ -4,16 +4,23 @@ type StartTaskResponse = {
   task_id: string | null;
 };
 
-export type StartTaskRequest = {
-  type: "extraction";
-  input: {
-    files_to_consider: {
-      file_path: string;
-      column_name?: string;
-    }[];
-    init_keywords: string[];
-  };
-};
+export type TaskType = "keywords extraction" | "context windows extraction";
+
+export type StartTaskRequest =
+  | {
+      type: "keywords extraction";
+      input: {
+        files_to_consider: {
+          file_path: string;
+          column_name?: string;
+        }[];
+        init_keywords: string[];
+      };
+    }
+  | {
+      type: "context windows extraction";
+      parent_id: string;
+    };
 
 export const startTask = async (
   classId: string,

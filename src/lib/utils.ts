@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+
 import { twMerge } from "tailwind-merge";
 import csv from "csv-parser";
 
@@ -32,4 +33,10 @@ export const shortFormatDate = (d: string) => {
     .split(" ")
     .join(" ");
   return date;
+};
+
+export const getFileName = (path: string) => {
+  const last = path.split("/").pop();
+  const fileName = last?.split("-").pop();
+  return fileName;
 };
