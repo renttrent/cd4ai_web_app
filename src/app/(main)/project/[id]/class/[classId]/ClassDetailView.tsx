@@ -8,7 +8,13 @@ import { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { formatDate, getFileName } from "@/lib/utils";
 import Link from "next/link";
-import { Task, getChildrenTasks, getTasks } from "@/util/task/tasks";
+import {
+  ContextWindowsExtractionTask,
+  KeywordsExtractionTask,
+  Task,
+  getChildrenTasks,
+  getTasks,
+} from "@/util/task/tasks";
 import { Modal } from "@/components/custom/Modal";
 import { CreateTaskForm } from "../_ui/CreateTaskForm";
 import {
@@ -27,6 +33,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CornerDownRight } from "lucide-react";
+import { ContextWindowTaskView } from "./ContextWindowTaskView";
+import { set } from "react-hook-form";
 
 export const ClassDetailView = ({ classId }: { classId: string }) => {
   const { data, isLoading } = useQuery({
@@ -55,6 +63,9 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
   const [isCreateTaskFormOpen, setIsCreateTaskFormOpen] = useState(false);
 
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
+
+  const [selectedWindowExtractionTask, setSelectedWindowExtractionTask] =
+    useState<ContextWindowsExtractionTask | null>(null);
 
   if (isLoading) {
     return <BarLoader width="100%" className="mt-4" />;
@@ -95,13 +106,18 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
           <div className="text-stone-900 font-medium">{data?.description}</div>
         </div>
         <div className="mt-10">
-          <div className="text-2xl">
-            Phase 1 <span className="font-bold">Extraction</span>
-          </div>
           {selectedTask !== null && taskListData && taskListData.length > 0 ? (
-            <TaskView task={taskListData[selectedTask]} />
-          ) : (
+            <TaskView
+              task={taskListData[selectedTask] as KeywordsExtractionTask}
+            />
+          ) : !selectedWindowExtractionTask ? (
             <div>No task selected</div>
+          ) : (
+            ""
+          )}
+
+          {selectedWindowExtractionTask && selectedTask == null && (
+            <ContextWindowTaskView task={selectedWindowExtractionTask} />
           )}
         </div>
       </section>
@@ -112,11 +128,17 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
             <div>
               {taskListData.map((task, index) => (
                 <TaskAccordion
-                  task={task}
+                  task={task as KeywordsExtractionTask}
                   key={task.id}
                   index={index}
                   selected={index == selectedTask}
                   onClick={() => setSelectedTask(index)}
+                  onChildrenClick={(task) => {
+                    setSelectedWindowExtractionTask(
+                      task as ContextWindowsExtractionTask
+                    );
+                    setSelectedTask(null);
+                  }}
                 />
               ))}
             </div>
@@ -145,12 +167,14 @@ const TaskAccordion = ({
   task,
   selected,
   onClick,
+  onChildrenClick,
   index,
 }: {
-  task: Task;
+  task: KeywordsExtractionTask;
   selected: boolean;
   index: number;
   onClick: () => void;
+  onChildrenClick?: (task: Task) => void;
 }) => {
   return (
     <Accordion type="single" collapsible>
@@ -187,7 +211,10 @@ const TaskAccordion = ({
           </TooltipProvider>
         </div>
         <AccordionContent>
-          <TaskChildrenList taskId={task.id} />
+          <TaskChildrenList
+            onChildTaskClick={onChildrenClick}
+            taskId={task.id}
+          />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -202,7 +229,7 @@ const TaskChildrenList = ({
   onChildTaskClick?: (task: Task) => void;
 }) => {
   const { data } = useQuery({
-    queryKey: ["children_tasks", taskId],
+    queryKey: ["context_windows_extraction_task", taskId],
     queryFn: async () => {
       const res = await getChildrenTasks(taskId);
       return res;
@@ -210,7 +237,7 @@ const TaskChildrenList = ({
   });
 
   return (
-    <div className="flex flec-col gap-2">
+    <div className="flex flex-col gap-2">
       {data?.map((task, index) => (
         <div className="flex items-center gap-2">
           <CornerDownRight className="text-gray-500" />
@@ -218,7 +245,10 @@ const TaskChildrenList = ({
             task={task}
             selected={false}
             name={`Task-CONTEXT-${index + 1}`}
-            onClick={() => onChildTaskClick && onChildTaskClick(task)}
+            onClick={() =>
+              onChildTaskClick &&
+              onChildTaskClick({ ...task, name: `Task-CONTEXT-${index + 1}` })
+            }
           />
         </div>
       ))}

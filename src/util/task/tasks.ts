@@ -1,15 +1,22 @@
 import { axios } from "../axios";
-import { TaskType } from "./start-task";
 
-export type Task = {
+export interface BaseTask {
+  name?: string;
   id: string;
-  type: TaskType;
   class_id: string;
   parent_id?: string | null;
   status: "in progress" | "completed" | "cancelled";
   start_time: string;
   end_time: string;
   valid: boolean;
+}
+
+export interface KeywordsExtractionTask extends BaseTask {
+  type: "keywords extraction";
+  result: {
+    extracted_keywords: string[];
+    filtered_keywords: string[];
+  } | null;
   input: {
     files_to_consider: {
       file_path: string;
@@ -17,11 +24,24 @@ export type Task = {
     }[];
     init_keywords: string[];
   };
+}
+
+export interface ContextWindowsExtractionTask extends BaseTask {
+  type: "context windows extraction";
   result: {
-    extracted_keywords: string[];
-    filtered_keywords: string[];
+    extracted_context_windows: string[];
+    filtered_context_windows: string[];
   } | null;
-};
+  input: {
+    files_to_consider: {
+      file_path: string;
+      column_name: string;
+    }[];
+    filtered_keywords: string[];
+  };
+}
+
+export type Task = KeywordsExtractionTask | ContextWindowsExtractionTask;
 
 export const getTasks = async (classId: string) => {
   const res = await axios.get(`/task?class_id=${classId}`);

@@ -2,7 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { formatDate, getFileName } from "@/lib/utils";
-import { KeywordsExtractionTask, Task } from "@/util/task/tasks";
+import {
+  ContextWindowsExtractionTask,
+  KeywordsExtractionTask,
+  Task,
+} from "@/util/task/tasks";
 import { array, object, string } from "yup";
 import { useUpdateTask } from "../_hooks/use-update-task";
 import { queryClient } from "@/util/query-client";
@@ -15,26 +19,24 @@ import { useCancelTask } from "../_hooks/use-cancel_task";
 import { useToast } from "@/components/ui/use-toast";
 import { FileBadge } from "@/components/custom/FileBadge";
 
-type KeywordsState = {
-  final_keywords: string[];
+type WindowsState = {
+  final_windows: string[];
 };
 
-const KeywordsSchema = object({
-  final_keywords: array().of(string().required()).required(),
+const windowsSchema = object({
+  final_windows: array().of(string().required()).required(),
 });
 
-export const TaskView = ({
+export const ContextWindowTaskView = ({
   task,
-  taskName,
 }: {
-  task: KeywordsExtractionTask;
-  taskName?: string;
+  task: ContextWindowsExtractionTask;
 }) => {
   const { handleSubmit, watch, setValue, reset, getValues, formState } =
     useValidatedForm({
-      schema: KeywordsSchema,
+      schema: windowsSchema,
       defaultValues: {
-        final_keywords: task.result?.filtered_keywords ?? [],
+        final_windows: task.result?.filtered_context_windows ?? [],
       },
     });
 
@@ -53,28 +55,20 @@ export const TaskView = ({
     });
   });
   const { toast } = useToast();
-  const { mutateAsync: StartTask } = useStartTask(() => {
-    // invalidateTaskList();
-    queryClient.invalidateQueries({
-      queryKey: ["context_windows_extraction_task", task.id],
-    });
-    toast({
-      title: "Started",
-      description: "Task has been started",
-    });
-  });
-  const final_words = watch("final_keywords");
+  const final_windows = watch("final_windows");
 
   const selectedTaskData = task;
 
-  const unselected_extracted_keywords = (
-    selectedTaskData?.result?.extracted_keywords ?? []
-  ).filter((word) => !final_words.includes(word) && word.includes(filter));
+  const unselected_extracted_windows = (
+    selectedTaskData?.result?.extracted_context_windows ?? []
+  ).filter(
+    (window) => !final_windows.includes(window) && window.includes(filter)
+  );
 
-  const onSubmit = async (data: KeywordsState) => {
+  const onSubmit = async (data: WindowsState) => {
     await updateTask({
       taskId: task.id,
-      result: { filtered_results: data.final_keywords },
+      result: { filtered_results: data.final_windows },
     });
     toast({
       title: "Updated",
@@ -93,12 +87,13 @@ export const TaskView = ({
       className="w-full border rounded-sm mt-2 p-4"
     >
       <div className="text-2xl">
-        Phase 1 <span className="font-bold">Extraction</span>
+        Phase 2 <span className="font-bold">Extraction</span>
       </div>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col font-medium text-lg">
-          {task.name && <span>TaskName : {task.name}</span>}
-          <div>TaskId :{task.id}</div>
+          <span>TaskName : {task.name}</span>
+          <span>TaskId :{task.id}</span>
+          <span> ParentId : {task.parent_id}</span>
         </div>
 
         <div className="flex flex-row gap-4 items-center">
@@ -116,24 +111,7 @@ export const TaskView = ({
               </Button>
             </>
           )}
-          {selectedTaskData.status === "completed" &&
-            selectedTaskData.result?.filtered_keywords.length && (
-              <Button
-                type="button"
-                onClick={() =>
-                  StartTask({
-                    classId: task.class_id,
-                    data: {
-                      type: "context windows extraction",
-                      parent_id: task.id,
-                    },
-                  })
-                }
-                variant="default"
-              >
-                Start New Context window Extraction
-              </Button>
-            )}
+
           {selectedTaskData?.valid && (
             <div className="bg-green-500 text-white px-2 py-1 rounded-full">
               Valid
@@ -150,9 +128,9 @@ export const TaskView = ({
       </div>
       <div className="flex flex-row justify-between">
         <div>
-          <div className="text-lg">Initial Keywords: </div>
-          <div className="flex flex-row gap-2">
-            {selectedTaskData?.input.init_keywords.map((keyword, index) => (
+          <div className="text-lg">Initial windows: </div>
+          <div className="flex flex-row gap-2 flex-wrap">
+            {selectedTaskData?.input.filtered_keywords.map((keyword, index) => (
               <Badge key={index}>{keyword}</Badge>
             ))}
           </div>
@@ -180,10 +158,10 @@ export const TaskView = ({
           </div>
         </div>
       </div>
-      {task.result?.extracted_keywords !== null && (
+      {task.result?.extracted_context_windows !== null && (
         <div className="flex flex-row justify-between mt-4 gap-4">
           <div className=" flex-1 flex flex-col gap-4">
-            <div className="text-lg">Filtered Extracted Keywords: </div>
+            <div className="text-lg">Filtered Extracted windows: </div>
             <div className="max-w-sm">
               <Input
                 className="h-6"
@@ -191,41 +169,41 @@ export const TaskView = ({
               />
             </div>
             <div className="flex gap-2 flex-wrap min-w-[1px]">
-              {unselected_extracted_keywords.map((keyword, index) => (
+              {unselected_extracted_windows.map((window, index) => (
                 <Badge
                   key={index}
                   className="w-fit cursor-pointer hover:bg-violet-500 hover:text-white"
                   variant="secondary"
                   onClick={() =>
-                    setValue("final_keywords", [...final_words, keyword], {
+                    setValue("final_windows", [...final_windows, window], {
                       shouldDirty: true,
                     })
                   }
                 >
-                  {keyword}
+                  {window}
                 </Badge>
               ))}
             </div>
           </div>
           <div className="flex-1 text-right flex flex-col gap-2">
-            <div className="text-lg">Filtered Keywords: </div>
+            <div className="text-lg">Filtered windows: </div>
             <div className="flex gap-2 flex-wrap">
-              {final_words.map((keyword, index) => (
+              {final_windows.map((window, index) => (
                 <Badge
                   key={index}
                   className="w-fit cursor-pointer hover:bg-red-500 hover:text-white"
                   variant="secondary"
                   onClick={() =>
                     setValue(
-                      "final_keywords",
-                      final_words.filter((word) => word !== keyword),
+                      "final_windows",
+                      final_windows.filter((word) => word !== window),
                       {
                         shouldDirty: true,
                       }
                     )
                   }
                 >
-                  {keyword}
+                  {window}
                 </Badge>
               ))}
             </div>
