@@ -45,13 +45,15 @@ export const TaskView = ({
     queryClient.invalidateQueries({ queryKey: ["taskList", task.class_id] });
   };
   const { mutateAsync: updateTask } = useUpdateTask();
-  const { mutateAsync: cancelTask } = useCancelTask(() => {
-    invalidateTaskList();
-    toast({
-      title: "Requested for Cancel",
-      description: "Task will be cancelled soon",
-    });
-  });
+  const { mutateAsync: cancelTask, isSuccess: isCancelled } = useCancelTask(
+    () => {
+      invalidateTaskList();
+      toast({
+        title: "Requested for Cancel",
+        description: "Task will be cancelled soon",
+      });
+    }
+  );
   const { toast } = useToast();
   const { mutateAsync: StartTask } = useStartTask(() => {
     // invalidateTaskList();
@@ -107,13 +109,15 @@ export const TaskView = ({
           {selectedTaskData?.status === "in progress" && (
             <>
               <MoonLoader size={30} speedMultiplier={0.8} color="green" />{" "}
-              <Button
-                type="button"
-                onClick={() => cancelTask({ taskId: task.id })}
-                variant="destructive"
-              >
-                Cancel
-              </Button>
+              {!isCancelled && (
+                <Button
+                  type="button"
+                  onClick={() => cancelTask({ taskId: task.id })}
+                  variant="destructive"
+                >
+                  Cancel
+                </Button>
+              )}
             </>
           )}
           {selectedTaskData.status === "completed" &&

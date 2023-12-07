@@ -279,7 +279,7 @@ const TaskButton = ({
       onClick={() => onClick(task)}
       className={`flex flex-row gap-2 w-full items-center ${
         selected ? "text-indigo-500" : "text-black"
-      }  ${selected && "text-white"} rounded-md   cursor-pointer font-medium`}
+      }  rounded-md   cursor-pointer font-medium`}
     >
       {task.status === "in progress" ? (
         <MoonLoader size={30} speedMultiplier={0.8} color="green" />
