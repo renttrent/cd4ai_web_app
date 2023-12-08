@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+#### also make sure to move the contents of .env.example to .env.local as these environment variables are required.
+
 First, run the development server:
 
 ```bash
