@@ -86,13 +86,10 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
           </Link>
         </div>
         <div className="flex flex-row justify-between items-center">
-          <div className="flex flex-row items-center text-5xl mt-2 mb-4 gap-4">
-            <div className="font-light text-stone-500">Class:</div>
-            <div className="font-bold text-stone-900">{data?.name}</div>
+          <div className="flex flex-row items-center text-2xl mt-2 mb-4 gap-4">
+            <div className="font-bold  text-stone-900">{data?.name}</div>
           </div>
           <div className="flex gap-2">
-            {/* <Button variant="destructive">Delete</Button> */}
-
             <Button onClick={() => setIsCreateTaskFormOpen(true)}>
               Create Keyword Extraction Task
             </Button>
@@ -102,12 +99,12 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
           <div className="italic text-stone-500">
             Last Updated: {formatDate(data?.modification_time ?? "")}
           </div>
-          <div className="text-stone-700">Description:</div>
-          <div className="text-stone-900 font-medium">{data?.description}</div>
+          <div className="text-gray-500  font-medium">{data?.description}</div>
         </div>
         <div className="mt-10">
           {selectedTask !== null && taskListData && taskListData.length > 0 ? (
             <TaskView
+              key={taskListData[selectedTask].id}
               task={taskListData[selectedTask] as KeywordsExtractionTask}
             />
           ) : !selectedWindowExtractionTask ? (
@@ -176,13 +173,7 @@ const TaskAccordion = ({
   onClick: () => void;
   onChildrenClick?: (task: Task) => void;
 }) => {
-  const taskName = `Task 
-  ${task.input.init_keywords
-    .slice(0, 7)
-    .map((t) => t[0])
-    .join("")
-    .toUpperCase()}
-  -${index + 1}`;
+  const taskName = task.name ?? "";
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
@@ -277,7 +268,7 @@ const TaskButton = ({
   return (
     <div
       onClick={() => onClick(task)}
-      className={`flex flex-row gap-2 w-full items-center ${
+      className={`flex flex-row gap-2 text-sm w-full items-center ${
         selected ? "text-indigo-500" : "text-black"
       }  rounded-md   cursor-pointer font-medium`}
     >

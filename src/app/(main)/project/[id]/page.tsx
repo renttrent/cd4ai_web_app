@@ -75,7 +75,6 @@ const Page = ({
       </div>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center text-5xl mt-2 mb-4 gap-4">
-          <div className="font-light text-stone-500">Project:</div>
           <div className="font-bold text-stone-900">{project?.name}</div>
         </div>
         <div className="flex flex-row items-center gap-4 font-bold">
@@ -86,18 +85,18 @@ const Page = ({
             <IoMdAddCircle />
             <span>Create Class</span>
           </button>
-          <button className="flex flex-row items-center gap-2 border-2 border-gray-900 bg-gray-900 text-gray-100 px-4 py-2 rounded-md hover:bg-transparent hover:text-gray-900">
+          {/* <button className="flex flex-row items-center gap-2 border-2 border-gray-900 bg-gray-900 text-gray-100 px-4 py-2 rounded-md hover:bg-transparent hover:text-gray-900">
             <MdEdit />
             <span>Edit project</span>
-          </button>
+          </button> */}
         </div>
       </div>
       <div className="flex flex-col gap-2">
         <div className="italic text-stone-500">
           Last Updated: {formatDate(project?.modification_time ?? "")}
         </div>
-        <div className="text-stone-700">Description:</div>
-        <div className="text-stone-900 font-medium">{project.description}</div>
+        {/* <div className="text-stone-700">Description:</div> */}
+        <div className="text-gray-600  font-medium">{project.description}</div>
         <div className="flex flex-row gap-2 my-2">
           <div className="text-stone-700">Files:</div>
           <div className="flex flex-row gap-4">

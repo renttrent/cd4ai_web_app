@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useFileDownload } from "@/hooks/use-file-download";
 import { useValidatedForm } from "@/hooks/use-validated-form";
+import { parseCsvAsync } from "@/lib/utils";
 import { Class, Project } from "@/types/types";
 import { getProject } from "@/util/projects/projects";
 import { TaskType, startTask } from "@/util/task/start-task";
@@ -20,7 +21,6 @@ import { PlusIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { ObjectSchema, array, object, string } from "yup";
-import Papa from "papaparse";
 interface TaskCreationState {
   type: "keywords extraction";
   input: {
@@ -232,7 +232,7 @@ const ColumnSelection = ({
 
   useEffect(() => {
     if (data) {
-      parseAsync(data.url).then((result: any) => {
+      parseCsvAsync(data.url).then((result: any) => {
         setHeaders(result?.meta?.fields ?? []);
       });
     }
@@ -263,10 +263,4 @@ const ColumnSelection = ({
       </Select>
     </div>
   );
-};
-
-const parseAsync = function (fileUrl: string) {
-  return new Promise(function (complete, error) {
-    Papa.parse(fileUrl, { download: true, header: true, complete, error });
-  });
 };

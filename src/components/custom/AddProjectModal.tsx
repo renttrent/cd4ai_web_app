@@ -12,6 +12,8 @@ import { createProject } from "@/util/projects/projects";
 import { useState } from "react";
 import { Modal } from "./Modal";
 import { queryClient } from "@/util/query-client";
+import { Textarea } from "../ui/textarea";
+import { LoadingButton } from "../ui/loadingbutton";
 
 type FormState = {
   name: string;
@@ -132,7 +134,7 @@ export function AddProjectButton() {
         Add Project
       </Button>
       <Modal
-        className="max-w-sm"
+        className="max-w-xl"
         open={isOpen}
         title="Add Project"
         description="Add your project details here. Click save when you're done.
@@ -157,9 +159,9 @@ export function AddProjectButton() {
                 <Label htmlFor="username" className="text-right">
                   Description
                 </Label>
-                <Input
+                <Textarea
                   {...register("description")}
-                  id="description"
+                  id="Enter project description"
                   className="col-span-3"
                   disabled={isPending}
                 />
@@ -225,7 +227,13 @@ export function AddProjectButton() {
                 </div> 
               )}*/}
             </div>
-            <Button type="submit">Save</Button>
+            <LoadingButton
+              disabled={isPending}
+              isLoading={isPending}
+              type="submit"
+            >
+              Save
+            </LoadingButton>
           </div>
         </form>
       </Modal>

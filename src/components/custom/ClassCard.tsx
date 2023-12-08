@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Class } from "@/types/types";
 import { formatDate } from "@/lib/utils";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { Card } from "../ui/card";
 
 interface ClassCardProps {
   classItem: Class;
@@ -9,10 +10,12 @@ interface ClassCardProps {
 
 const ClassCard = ({ classItem }: ClassCardProps) => {
   return (
-    <div
-      className="border rounded-md bg-gray-50 mb-4 p-4 flex flex-col"
+    <Card
+      className=" hover:bg-gray-50 mb-4 p-4 flex flex-col"
       style={{ minWidth: "200px" }}
     >
+      <div className="font-medium text-sm text-primary">Class</div>
+
       <div className="flex-grow">
         <Link
           href={`/project/${classItem.project_id}/class/${classItem.id}`}
@@ -24,8 +27,7 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
           </span>
         </Link>
         <div>
-          <div className="font-medium">Description:</div>
-          <p className="text-base text-gray-800 mt-2">
+          <p className="text-base text-gray-800 mt-2 opacity-70">
             {classItem.description}
           </p>
         </div>
@@ -34,7 +36,7 @@ const ClassCard = ({ classItem }: ClassCardProps) => {
           <div>{formatDate(classItem.modification_time)}</div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { formatDate, getFileName } from "@/lib/utils";
+import { cn, formatDate, getFileName } from "@/lib/utils";
 import {
   ContextWindowsExtractionTask,
   KeywordsExtractionTask,
@@ -89,21 +89,28 @@ export const ContextWindowTaskView = ({
       className="w-full border rounded-sm mt-2 p-4"
     >
       <div className="text-2xl">
-        Phase 2 <span className="font-bold">Extraction</span>
+        <span className="font-bold">{task.type}</span>
       </div>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col font-medium text-lg">
-          <span>TaskName : {task.name}</span>
-          <span>TaskId :{task.id}</span>
-          <span> ParentId : {task.parent_id}</span>
+          {task.name && <span>Task Name : {task.name}</span>}
         </div>
 
-        <div className="flex flex-row gap-4 items-center">
-          <div>Status {selectedTaskData?.status}</div>
-          {}
+        <div
+          className={cn(
+            "flex flex-row gap-4 items-center",
+            selectedTaskData.status == "in progress"
+              ? "text-yellow-500"
+              : selectedTaskData.status == "completed"
+              ? "text-green-500"
+              : "text-red-500"
+          )}
+        >
+          <div>{selectedTaskData?.status}</div>
+
           {selectedTaskData?.status === "in progress" && (
             <>
-              <MoonLoader size={30} speedMultiplier={0.8} color="green" />{" "}
+              <MoonLoader size={25} speedMultiplier={0.8} color="green" />
               {!isCancelled && (
                 <Button
                   type="button"

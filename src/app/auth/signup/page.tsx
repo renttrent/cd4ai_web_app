@@ -49,7 +49,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isSuccess) {
-      router.push("/");
+      router.push("/auth/login?success=true");
     }
   }, [isSuccess]);
 
@@ -74,13 +74,11 @@ export default function Login() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="firstname">
-              First Name
-            </Label>
+            <Label htmlFor="firstname">First Name</Label>
             <Input
               {...register("firstname")}
               id="firstname"
-              placeholder="John"
+              placeholder="Stephen"
               type="text"
               autoCapitalize="none"
               autoCorrect="off"
@@ -88,9 +86,7 @@ export default function Login() {
             />
           </div>
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="lastname">
-              Last Name
-            </Label>
+            <Label htmlFor="lastname">Last Name</Label>
             <Input
               {...register("lastname")}
               id="lastname"
@@ -102,9 +98,7 @@ export default function Login() {
             />
           </div>
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="username">
-              Username
-            </Label>
+            <Label htmlFor="username">Username</Label>
             <Input
               {...register("username")}
               id="username"
@@ -116,13 +110,11 @@ export default function Login() {
             />
           </div>
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="password">
-              Password
-            </Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               {...register("password")}
               id="password"
-              placeholder="Password"
+              placeholder="password"
               type="password"
               autoCapitalize="none"
               autoCorrect="off"

@@ -2,6 +2,8 @@ import { Project } from "@/types/types";
 import React from "react";
 import { AiFillFolderOpen } from "react-icons/ai";
 import { FileBadge } from "./FileBadge";
+import { Card } from "../ui/card";
+import { Clipboard, Paperclip } from "lucide-react";
 
 interface ProjectCardProps {
   project: Project;
@@ -14,27 +16,31 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   }
 
   return (
-    <div className="p-4 border rounded-sm bg-gray-50">
-      <div className="font-medium text-sm text-violet-500">Project</div>
-      <div className="font-bold text-lg">{project.name}</div>
-      <div className="text-lg">Subtitle</div>
-      <div className="text-sm text-gray-500">{project.description}</div>
-      <div className="mt-4 flex flex-col gap-2 w-full">
-        {project.files.map((file, index) => (
-          <button
-            key={index}
-            className={`${
-              index % 2 === 0 ? "bg-gray-200" : "bg-gray-100"
-            } px-2 hover:bg-indigo-500 rounded-xs hover:text-white`}
-          >
-            <div className="flex gap-2 items-center w-full">
-              <AiFillFolderOpen />
-              <span> {file.file_name}</span>
+    <Card className="flex flex-col gap-1 p-4 hover:bg-gray-50">
+      <div className="font-medium text-sm text-primary">Project</div>
+      <div className="flex justify-between">
+        <div className="font-bold text-md">{project.name}</div>
+        <div className="text-sm opacity-70">
+          <div className="flex gap-0.5 items-center">
+            <Paperclip size="10px" />
+            <div>
+              {project.files.length
+                ? project.files.length == 1
+                  ? "1 file"
+                  : `{project.files.length} files`
+                : null}
             </div>
-          </button>
-        ))}
+          </div>
+        </div>
       </div>
-    </div>
+      <div className="text-sm text-gray-500 line-clamp-3 text-ellipsis">
+        {project.description} Lorem ipsum, dolor sit amet consectetur
+        adipisicing elit. Atque, numquam a facere minima quisquam possimus
+        corrupti, rem accusamus reprehenderit, pariatur placeat quasi
+        consequuntur. Porro, molestias! Id unde dignissimos incidunt
+        reprehenderit?
+      </div>
+    </Card>
   );
 };
 

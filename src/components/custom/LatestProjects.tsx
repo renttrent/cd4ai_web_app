@@ -23,25 +23,28 @@ export const LatestProjectsView = () => {
   );
 
   return (
-    <div className="mt-10">
+    <div className="flex flex-col gap-4 mt-6">
       <div className="flex items-center justify-between">
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search..."
+          placeholder="search..."
           className="p-2 border-2 rounded-md focus:outline-none focus:border-violet-500 focus-visible:border-violet-500"
           style={{ width: "31.5%", lineHeight: "2%" }}
         />
       </div>
-      <div className="text-xl mt-8">Your latest projects</div>
-      <div className={`${isLoading ? "hidden" : "border mt-2"}`} />
+      <div className="flex   justify-between flex-wrap items-center">
+        <div className="text-xl font-bold">Your Projects</div>
+        <span className="opacity-70"> Total count: {projects?.length}</span>
+      </div>
+      <div className={`${isLoading ? "hidden" : "border"}`} />
       {isLoading && (
-        <div className="text-violet-500 bg-violet-100 rounded-xl mt-1">
+        <div className="bg-primary rounded-xl">
           <BarLoader width="100%" color={colors.violet[500]} />
         </div>
       )}
-      <div className="grid grid-cols-3 gap-10 mt-4">
+      <div className="grid grid-cols-3 gap-10 ">
         {filteredProjects.map((project) => (
           <Link href={`/project/${project.id}`} key={project.id}>
             <ProjectCard project={project} />

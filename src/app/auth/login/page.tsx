@@ -8,11 +8,12 @@ import { signIn } from "next-auth/react";
 import { ObjectSchema, object, string } from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
 import { PulseLoader } from "react-spinners";
 import { useEffect } from "react";
 import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
 
 type LoginState = {
   username: string;
@@ -31,7 +32,7 @@ export default function Login() {
       const res = await signIn("credentials", {
         username: data.username,
         password: data.password,
-        redirect: true,
+        redirect: false,
         callbackUrl: "/",
       });
 
@@ -54,6 +55,21 @@ export default function Login() {
     }
   }, [isSuccess]);
 
+  console.log("error");
+  console.log(isError, error);
+  const params = useSearchParams();
+  const { toast } = useToast();
+  useEffect(() => {
+    const isSuccess = params.get("success") == "true";
+    if (isSuccess) {
+      toast({
+        title: "Sign up was sucessful",
+        description: "You can use your credentials to login.",
+        variant: "default",
+      });
+    }
+  }, []);
+
   const onSubmit = async (data: LoginState) => {
     try {
       await mutateAsync(data);
@@ -68,24 +84,22 @@ export default function Login() {
         "w-full grid gap-2 shadow-xs px-4 py-6 border-2 border-gray-100 rounded-xl shadow-gray-300"
       )}
     >
-      {isError && <Alert variant="destructive">Invalid Credentials</Alert>}
-
       <div className="flex flex-col gap-2 items-center">
         <span className="text-2xl font-semibold">Login to your account</span>
         <span className="text-sm text-gray-600">
           Enter your credentials below
         </span>
       </div>
+      {isError && <Alert variant="destructive">Invalid Credentials</Alert>}
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="username">
-              Username
-            </Label>
+            <Label htmlFor="username">Username</Label>
             <Input
               {...register("username")}
               id="email"
-              placeholder="username"
+              placeholder="your username here"
               type="text"
               autoCapitalize="none"
               autoCorrect="off"
@@ -93,13 +107,11 @@ export default function Login() {
             />
           </div>
           <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="password">
-              Password
-            </Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               {...register("password")}
               id="password"
-              placeholder="Password"
+              placeholder="your password here"
               type="password"
               autoCapitalize="none"
               autoCorrect="off"

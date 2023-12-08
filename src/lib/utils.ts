@@ -1,3 +1,5 @@
+import Papa from "papaparse";
+
 import { type ClassValue, clsx } from "clsx";
 
 import { twMerge } from "tailwind-merge";
@@ -39,4 +41,10 @@ export const getFileName = (path: string) => {
   const last = path.split("/").pop();
   const fileName = last?.split("-").pop();
   return fileName;
+};
+
+export const parseCsvAsync = function (fileUrl: string) {
+  return new Promise(function (complete, error) {
+    Papa.parse(fileUrl, { download: true, header: true, complete, error });
+  });
 };
