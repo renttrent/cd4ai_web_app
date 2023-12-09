@@ -20,7 +20,7 @@ export const FileBadge = ({ name, path }: { name: string; path: string }) => {
   return (
     <div>
       <Modal
-        className="h-[85%] w-[90%] max-w-none  flex flex-col"
+        className="h-[85%] w-[90%] max-w-none flex flex-col"
         title="File Preview"
         open={isOpen}
         onClose={() => setIsOpen(false)}
@@ -67,13 +67,12 @@ const FilePreview = ({ path }: { path: string }) => {
   if (data?.blob.type == "text/csv") {
     return (
       <div className="flex-1 bg-gray-100 overflow-auto">
-        <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
+        <Table className="h-[inherit] overflow-x-scroll overflow-y-scroll">
           <TableHeader>
             <TableRow>
               {csvHeaders.map((head) => {
                 return (
-                  <TableHead className="w-[50px]" key={head}>
+                  <TableHead className="w-[100px]" key={head}>
                     {head}
                   </TableHead>
                 );
@@ -84,7 +83,11 @@ const FilePreview = ({ path }: { path: string }) => {
             {csvdata.map((row, index) => (
               <TableRow key={index}>
                 {Object.keys(row).map((cell, index) => {
-                  return <TableCell key={index}>{row[cell]}</TableCell>;
+                  return (
+                    <TableCell className="w-[100px]" key={index}>
+                      {row[cell]}
+                    </TableCell>
+                  );
                 })}
               </TableRow>
             ))}

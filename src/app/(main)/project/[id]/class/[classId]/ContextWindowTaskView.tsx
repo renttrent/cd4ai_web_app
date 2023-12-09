@@ -1,23 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { cn, formatDate, getFileName } from "@/lib/utils";
-import {
-  ContextWindowsExtractionTask,
-  KeywordsExtractionTask,
-  Task,
-} from "@/util/task/tasks";
+import { ContextWindowsExtractionTask } from "@/util/task/tasks";
 import { array, object, string } from "yup";
 import { useUpdateTask } from "../_hooks/use-update-task";
 import { queryClient } from "@/util/query-client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { d } from "@/util/dayjs";
-import { useStartTask } from "../_hooks/use-start-task";
-import { ClipLoader, MoonLoader, PulseLoader } from "react-spinners";
-import { useCancelTask } from "../_hooks/use-cancel_task";
 import { useToast } from "@/components/ui/use-toast";
-import { FileBadge } from "@/components/custom/FileBadge";
+import { TaskInfo } from "./TaskInfo";
+import { Popover, PopoverClose } from "@radix-ui/react-popover";
+import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { X } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 type WindowsState = {
   final_windows: string[];
@@ -47,15 +42,7 @@ export const ContextWindowTaskView = ({
     queryClient.invalidateQueries({ queryKey: ["taskList", task.class_id] });
   };
   const { mutateAsync: updateTask } = useUpdateTask();
-  const { mutateAsync: cancelTask, isSuccess: isCancelled } = useCancelTask(
-    () => {
-      invalidateTaskList();
-      toast({
-        title: "Requested for Cancel",
-        description: "Task will be cancelled soon",
-      });
-    }
-  );
+
   const { toast } = useToast();
   const final_windows = watch("final_windows");
 
@@ -70,157 +57,100 @@ export const ContextWindowTaskView = ({
   const onSubmit = async (data: WindowsState) => {
     await updateTask({
       taskId: task.id,
-      result: { filtered_results: data.final_windows },
+      data: { result: { filtered_results: data.final_windows ?? [] } },
     });
     toast({
       title: "Updated",
-      description: "Task results has been updated",
+      description: "Task results have been updated",
     });
     invalidateTaskList();
     reset(getValues());
   };
 
-  const durationParsed = d
-    .duration(d(selectedTaskData.end_time).diff(selectedTaskData.start_time))
-    .format("HH:mm:ss");
+  const renameWindow = (name: string, index: number) => {
+    const new_windows = final_windows.map((window, i) =>
+      i == index ? name : window
+    );
+    setValue("final_windows", new_windows, { shouldDirty: true });
+  };
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="w-full border rounded-sm mt-2 p-4"
     >
-      <div className="text-2xl">
-        <span className="font-bold">{task.type}</span>
-      </div>
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-col font-medium text-lg">
-          {task.name && <span>Task Name : {task.name}</span>}
-        </div>
-
-        <div
-          className={cn(
-            "flex flex-row gap-4 items-center",
-            selectedTaskData.status == "in progress"
-              ? "text-yellow-500"
-              : selectedTaskData.status == "completed"
-              ? "text-green-500"
-              : "text-red-500"
-          )}
-        >
-          <div>{selectedTaskData?.status}</div>
-
-          {selectedTaskData?.status === "in progress" && (
-            <>
-              <MoonLoader size={25} speedMultiplier={0.8} color="green" />
-              {!isCancelled && (
-                <Button
-                  type="button"
-                  onClick={() => cancelTask({ taskId: task.id })}
-                  variant="destructive"
-                >
-                  Cancel
-                </Button>
-              )}
-            </>
-          )}
-
-          {selectedTaskData?.valid && (
-            <div className="bg-green-500 text-white px-2 py-1 rounded-full">
-              Valid
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-row items-center justify-between text-sm my-4 italic">
-        <div>Started at - {formatDate(selectedTaskData?.start_time ?? "")}</div>
-        <div>Estimated Time -{durationParsed}</div>
-        {selectedTaskData?.end_time && (
-          <div>Ended at - {formatDate(selectedTaskData?.end_time ?? "")}</div>
-        )}
-      </div>
-      <div className="flex flex-row justify-between">
-        <div>
-          <div className="text-lg">Initial windows: </div>
-          <div className="flex flex-row gap-2 flex-wrap">
-            {selectedTaskData?.input.filtered_keywords.map((keyword, index) => (
-              <Badge key={index}>{keyword}</Badge>
-            ))}
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="text-lg">Considered Files:</div>
-          <div>
-            {selectedTaskData?.input.files_to_consider.map((file, index) => (
-              <div key={index} className="flex flex-row gap-2 items-center">
-                <FileBadge
-                  name={getFileName(file.file_path) ?? ""}
-                  path={file.file_path}
+      <TaskInfo task={selectedTaskData} />
+      {task.result?.extracted_context_windows !== null &&
+        task.status == "completed" && (
+          <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
+            <div className=" flex-1 flex flex-col gap-4 p-2 ">
+              <div className="text-lg font-bold">Extracted Windows</div>
+              <div className="max-w-sm">
+                <Input
+                  placeholder="search window"
+                  className="h-6"
+                  onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
-                {/* <div className="font-bold">{getFileName(file.file_path)}</div> */}
-                {file.column_name && (
-                  <div className="">
-                    Selected Column:
-                    <span className="font-bold text-violet-500">
-                      {" " + file.column_name}
-                    </span>
-                  </div>
-                )}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      {task.result?.extracted_context_windows !== null && (
-        <div className="flex flex-row justify-between mt-4 gap-4">
-          <div className=" flex-1 flex flex-col gap-4">
-            <div className="text-lg">Filtered Extracted windows: </div>
-            <div className="max-w-sm">
-              <Input
-                className="h-6"
-                onChange={(e) => setFilter(e.currentTarget.value ?? "")}
-              />
-            </div>
-            <div className="flex gap-2 flex-wrap min-w-[1px]">
-              {unselected_extracted_windows.map((window, index) => (
-                <Badge
-                  key={index}
-                  className="w-fit cursor-pointer hover:bg-violet-500 hover:text-white"
-                  variant="secondary"
-                  onClick={() =>
-                    setValue("final_windows", [...final_windows, window], {
-                      shouldDirty: true,
-                    })
-                  }
-                >
-                  {window}
-                </Badge>
-              ))}
-            </div>
-          </div>
-          <div className="flex-1 text-right flex flex-col gap-2">
-            <div className="text-lg">Filtered windows: </div>
-            <div className="flex gap-2 flex-wrap">
-              {final_windows.map((window, index) => (
-                <Badge
-                  key={index}
-                  className="w-fit cursor-pointer hover:bg-red-500 hover:text-white"
-                  variant="secondary"
-                  onClick={() =>
-                    setValue(
-                      "final_windows",
-                      final_windows.filter((word) => word !== window),
-                      {
+              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto">
+                {unselected_extracted_windows.map((window, index) => (
+                  <Badge
+                    key={index}
+                    className="w-fit cursor-pointer hover:bg-primary hover:text-white bg-gray-400 hover:bg-gray-500"
+                    variant="default"
+                    onClick={() =>
+                      setValue("final_windows", [...final_windows, window], {
                         shouldDirty: true,
-                      }
-                    )
-                  }
-                >
-                  {window}
-                </Badge>
-              ))}
+                      })
+                    }
+                  >
+                    {window}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1 text-right flex flex-col gap-4 p-2">
+              <div className="text-left text-lg font-bold">
+                Filtered Windows
+              </div>
+              <div className="max-w-sm invisible">
+                <Input
+                  placeholder="search keyword"
+                  className="h-6"
+                  onChange={(e) => setFilter(e.currentTarget.value ?? "")}
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto">
+                {final_windows.map((window, index) => (
+                  <Popover key={index}>
+                    <PopoverTrigger>
+                      <Badge
+                        key={index}
+                        className=" cursor-pointer hover:bg-blue-500 hover:text-white text-white bg-primary"
+                        variant="secondary"
+                      >
+                        <span>{window}</span>
+                      </Badge>
+                    </PopoverTrigger>
+
+                    <EditPopoverContent
+                      onRemovePress={() => {
+                        setValue(
+                          "final_windows",
+                          final_windows.filter((word) => word !== window),
+                          {
+                            shouldDirty: true,
+                          }
+                        );
+                      }}
+                      onChange={(value) => renameWindow(value, index)}
+                      value={window}
+                    />
+                  </Popover>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       <div className="text-right mt-2">
         {isDirty && (
           <Button
@@ -232,5 +162,77 @@ export const ContextWindowTaskView = ({
         )}
       </div>
     </form>
+  );
+};
+
+const EditPopoverContent = ({
+  onChange,
+  onRemovePress,
+  value,
+}: {
+  onChange: (value: string) => void;
+  onRemovePress: () => void;
+  value: string;
+}) => {
+  const ref = React.useRef<HTMLButtonElement>(null);
+
+  const [_value, setValue] = useState<string>(value);
+
+  const closePopover = () => {
+    ref.current?.click();
+  };
+  return (
+    <PopoverContent>
+      <div className="flex flex-col gap-4">
+        <PopoverClose ref={ref} className="hidden">
+          close
+        </PopoverClose>
+        <Label className="font-bold">Edit window</Label>
+        <Input
+          onChange={(e) => setValue(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key == "Enter") {
+              e.preventDefault();
+
+              closePopover();
+              setTimeout(() => {
+                onChange(_value);
+              }, 0);
+            }
+          }}
+          defaultValue={value}
+        />
+        <div className="flex gap-2 justify-between flex-wrap">
+          <Button
+            size="sm"
+            className="flex gap-2"
+            type="button"
+            variant="destructive"
+            onClick={() => {
+              closePopover();
+              onRemovePress();
+            }}
+          >
+            <span>Remove</span>
+
+            <X />
+          </Button>
+          <Button
+            size="sm"
+            className="flex gap-2"
+            type="button"
+            variant="default"
+            onClick={() => {
+              closePopover();
+              setTimeout(() => {
+                onChange(_value);
+              }, 0);
+            }}
+          >
+            <span>Update</span>
+          </Button>
+        </div>
+      </div>
+    </PopoverContent>
   );
 };

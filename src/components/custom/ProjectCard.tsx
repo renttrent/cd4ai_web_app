@@ -34,11 +34,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         </div>
       </div>
       <div className="text-sm text-gray-500 line-clamp-3 text-ellipsis">
-        {project.description} Lorem ipsum, dolor sit amet consectetur
-        adipisicing elit. Atque, numquam a facere minima quisquam possimus
-        corrupti, rem accusamus reprehenderit, pariatur placeat quasi
-        consequuntur. Porro, molestias! Id unde dignissimos incidunt
-        reprehenderit?
+        {project.description}
       </div>
     </Card>
   );

@@ -124,7 +124,9 @@ const Page = ({
           projectId={project.id}
         />
       </Modal>
-
+      {!!classes.length && (
+        <div className="mt-8 font-bold text-lg">Project Classes </div>
+      )}
       <div className="mt-8">
         {classes.map((classItem: any, index: number) => (
           <ClassCard key={index} classItem={classItem} />

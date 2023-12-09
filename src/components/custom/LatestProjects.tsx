@@ -44,7 +44,7 @@ export const LatestProjectsView = () => {
           <BarLoader width="100%" color={colors.violet[500]} />
         </div>
       )}
-      <div className="grid grid-cols-3 gap-10 ">
+      <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-4 ">
         {filteredProjects.map((project) => (
           <Link href={`/project/${project.id}`} key={project.id}>
             <ProjectCard project={project} />

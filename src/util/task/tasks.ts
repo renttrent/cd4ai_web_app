@@ -55,6 +55,12 @@ export const updateTask = async (taskId: string, data: any) => {
   return res.data.body as Task;
 };
 
+export const RenameTask = async (taskId: string, name: string) => {
+  const res = await axios.put(`/task/rename/${taskId}?task_name=${name}`);
+
+  return res.data.body as Task;
+};
+
 export const getChildrenTasks = async (taskId: string) => {
   const res = await axios.get(`/task/children/${taskId}/`);
 

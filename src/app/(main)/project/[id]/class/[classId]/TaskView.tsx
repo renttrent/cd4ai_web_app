@@ -14,6 +14,8 @@ import { ClipLoader, MoonLoader, PulseLoader } from "react-spinners";
 import { useCancelTask } from "../_hooks/use-cancel_task";
 import { useToast } from "@/components/ui/use-toast";
 import { FileBadge } from "@/components/custom/FileBadge";
+import { TaskName } from "./TaskName";
+import { TaskInfo } from "./TaskInfo";
 
 type KeywordsState = {
   final_keywords: string[];
@@ -39,15 +41,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
     queryClient.invalidateQueries({ queryKey: ["taskList", task.class_id] });
   };
   const { mutateAsync: updateTask } = useUpdateTask();
-  const { mutateAsync: cancelTask, isSuccess: isCancelled } = useCancelTask(
-    () => {
-      invalidateTaskList();
-      toast({
-        title: "Requested for Cancel",
-        description: "Task will be cancelled soon",
-      });
-    }
-  );
+
   const { toast } = useToast();
   const { mutateAsync: StartTask } = useStartTask(() => {
     // invalidateTaskList();
@@ -70,166 +64,86 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
   const onSubmit = async (data: KeywordsState) => {
     await updateTask({
       taskId: task.id,
-      result: { filtered_results: data.final_keywords },
+      data: { result: { filtered_results: data.final_keywords } },
     });
     toast({
       title: "Updated",
-      description: "Task results has been updated",
+      description: "Task results have been updated",
     });
     invalidateTaskList();
     reset(getValues());
   };
 
-  const durationParsed = d
-    .duration(d(selectedTaskData.end_time).diff(selectedTaskData.start_time))
-    .format("HH:mm:ss");
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="w-full border rounded-sm mt-2 p-4"
     >
-      <div className="text-2xl">
-        <span className="font-bold">{task.type}</span>
-      </div>
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-col font-medium text-lg">
-          {task.name && <span>Task Name : {task.name}</span>}
-        </div>
-
-        <div
-          className={cn(
-            "flex flex-row gap-4 items-center font-bold",
-            selectedTaskData.status == "in progress"
-              ? "text-yellow-500"
-              : selectedTaskData.status == "completed"
-              ? "text-green-500"
-              : "text-red-500"
-          )}
-        >
-          <div>{selectedTaskData?.status}</div>
-
-          {selectedTaskData?.status === "in progress" && (
-            <>
-              <MoonLoader size={30} speedMultiplier={0.8} color="green" />{" "}
-              {!isCancelled && (
-                <Button
-                  type="button"
-                  onClick={() => cancelTask({ taskId: task.id })}
-                  variant="destructive"
-                >
-                  Cancel
-                </Button>
-              )}
-            </>
-          )}
-
-          {selectedTaskData?.valid && (
-            <div className="bg-green-500 text-white px-2 py-1 rounded-full">
-              Valid
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-row items-center justify-between text-sm my-4 italic">
-        <div>Started at - {formatDate(selectedTaskData?.start_time ?? "")}</div>
-        <div>Estimated Time - {durationParsed}</div>
-        {selectedTaskData?.end_time && (
-          <div>Ended at - {formatDate(selectedTaskData?.end_time ?? "")}</div>
-        )}
-      </div>
-      <div className="flex flex-row justify-between flex-wrap">
-        <div className="flex-1 ">
-          <div className="text-lg font-bold">Initial Keywords</div>
-          <div className="flex flex-row gap-2">
-            {selectedTaskData?.input.init_keywords.map((keyword, index) => (
-              <Badge key={index}>{keyword}</Badge>
-            ))}
-          </div>
-        </div>
-        <div className="flex-1 px-2">
-          <div className="text-lg font-bold">Considered Files</div>
-          <div className="flex flex-col gap-2">
-            {selectedTaskData.input.files_to_consider.map((file, index) => (
-              <div key={index} className="flex flex-row gap-2 flex-wrap">
-                <FileBadge
-                  name={getFileName(file.file_path) ?? ""}
-                  path={file.file_path}
-                />
-
-                {file.column_name && (
-                  <div className="text-sm">
-                    Selected column:
-                    <span className="font-bold text-primary">
-                      {" " + file.column_name}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <TaskInfo task={selectedTaskData} />
       <div className="bg-gray-200 h-0.5 w-full my-4" />
-      {task.result?.extracted_keywords !== null && 1 && (
-        <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
-          <div className=" flex-1 flex flex-col gap-4 p-2 ">
-            <div className="text-lg font-bold">Extracted Keywords</div>
-            <div className="max-w-sm">
-              <Input
-                placeholder="search keyword"
-                className="h-6"
-                onChange={(e) => setFilter(e.currentTarget.value ?? "")}
-              />
-            </div>
-            <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto">
-              {unselected_extracted_keywords.map((keyword, index) => (
-                <Badge
-                  key={index}
-                  className="w-fit cursor-pointer hover:bg-primary hover:text-white bg-gray-400 hover:bg-gray-500"
-                  variant="default"
-                  onClick={() =>
-                    setValue("final_keywords", [...final_words, keyword], {
-                      shouldDirty: true,
-                    })
-                  }
-                >
-                  {keyword}
-                </Badge>
-              ))}
-            </div>
-          </div>
-          <div className="flex-1 text-right flex flex-col gap-4 p-2">
-            <div className="text-left text-lg font-bold">Filtered Keywords</div>
-            <div className="max-w-sm invisible">
-              <Input
-                placeholder="search keyword"
-                className="h-6"
-                onChange={(e) => setFilter(e.currentTarget.value ?? "")}
-              />
-            </div>
-            <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto">
-              {final_words.map((keyword, index) => (
-                <Badge
-                  key={index}
-                  className="w-fit cursor-pointer hover:bg-red-500 hover:text-white text-white bg-primary"
-                  variant="secondary"
-                  onClick={() =>
-                    setValue(
-                      "final_keywords",
-                      final_words.filter((word) => word !== keyword),
-                      {
+      {task.result?.extracted_keywords !== null &&
+        task.status == "completed" && (
+          <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
+            <div className=" flex-1 flex flex-col gap-4 p-2 ">
+              <div className="text-lg font-bold">Extracted Keywords</div>
+              <div className="max-w-sm">
+                <Input
+                  placeholder="search keyword"
+                  className="h-6"
+                  onChange={(e) => setFilter(e.currentTarget.value ?? "")}
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto">
+                {unselected_extracted_keywords.map((keyword, index) => (
+                  <Badge
+                    key={index}
+                    className="w-fit cursor-pointer hover:bg-primary hover:text-white bg-gray-400 hover:bg-gray-500"
+                    variant="default"
+                    onClick={() =>
+                      setValue("final_keywords", [...final_words, keyword], {
                         shouldDirty: true,
-                      }
-                    )
-                  }
-                >
-                  {keyword}
-                </Badge>
-              ))}
+                      })
+                    }
+                  >
+                    {keyword}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1 text-right flex flex-col gap-4 p-2">
+              <div className="text-left text-lg font-bold">
+                Filtered Keywords
+              </div>
+              <div className="max-w-sm invisible">
+                <Input
+                  placeholder="search keyword"
+                  className="h-6"
+                  onChange={(e) => setFilter(e.currentTarget.value ?? "")}
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto">
+                {final_words.map((keyword, index) => (
+                  <Badge
+                    key={index}
+                    className="w-fit cursor-pointer hover:bg-red-500 hover:text-white text-white bg-primary"
+                    variant="secondary"
+                    onClick={() =>
+                      setValue(
+                        "final_keywords",
+                        final_words.filter((word) => word !== keyword),
+                        {
+                          shouldDirty: true,
+                        }
+                      )
+                    }
+                  >
+                    {keyword}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       <div className="text-right  mt-2">
         {!isDirty &&
           selectedTaskData.status === "completed" &&
@@ -247,7 +161,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
               }
               variant="default"
             >
-              Start New Context window Extraction
+              Start New Context Window Extraction
             </Button>
           )}
 

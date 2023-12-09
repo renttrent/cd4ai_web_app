@@ -32,7 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CornerDownRight } from "lucide-react";
+import { CornerDownRight, Loader2 } from "lucide-react";
 import { ContextWindowTaskView } from "./ContextWindowTaskView";
 import { set } from "react-hook-form";
 
@@ -185,7 +185,6 @@ const TaskAccordion = ({
                   <TaskButton
                     task={task}
                     selected={selected}
-                    name={taskName}
                     onClick={() => onClick()}
                   />
                 </AccordionTrigger>
@@ -239,14 +238,7 @@ const TaskChildrenList = ({
           <TaskButton
             task={task}
             selected={false}
-            name={taskName + "-SUBTASK-" + (index + 1).toString()}
-            onClick={() =>
-              onChildTaskClick &&
-              onChildTaskClick({
-                ...task,
-                name: taskName + "-SUBTASK-" + (index + 1).toString(),
-              })
-            }
+            onClick={() => onChildTaskClick && onChildTaskClick(task)}
           />
         </div>
       ))}
@@ -257,12 +249,10 @@ const TaskChildrenList = ({
 const TaskButton = ({
   task,
   selected,
-  name,
   onClick,
 }: {
   task: Task;
   selected: boolean;
-  name: string;
   onClick: (task: Task) => void;
 }) => {
   return (
@@ -273,13 +263,13 @@ const TaskButton = ({
       }  rounded-md   cursor-pointer font-medium`}
     >
       {task.status === "in progress" ? (
-        <MoonLoader size={30} speedMultiplier={0.8} color="green" />
+        <Loader2 className="text-yellow-500 animate-spin" />
       ) : task.status === "completed" ? (
         <FaCheckCircle className="text-green-500" />
       ) : (
         <FaCircleXmark className="text-red-500" />
       )}
-      <div>{name}</div>
+      <div>{task.name}</div>
     </div>
   );
 };

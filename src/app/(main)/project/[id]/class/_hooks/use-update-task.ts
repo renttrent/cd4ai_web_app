@@ -7,12 +7,12 @@ export const useUpdateTask = () => {
   const q = useMutation({
     mutationFn: async ({
       taskId,
-      result,
+      data,
     }: {
       taskId: string;
-      result: { filtered_results: string[] };
+      data: { name?: string; result?: { filtered_results: string[] } };
     }) => {
-      return updateTask(taskId, { result });
+      return updateTask(taskId, data);
     },
   });
 
