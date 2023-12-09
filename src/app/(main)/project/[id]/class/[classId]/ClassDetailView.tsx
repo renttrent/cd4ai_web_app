@@ -114,7 +114,10 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
           )}
 
           {selectedWindowExtractionTask && selectedTask == null && (
-            <ContextWindowTaskView task={selectedWindowExtractionTask} />
+            <ContextWindowTaskView
+              key={selectedWindowExtractionTask.id}
+              task={selectedWindowExtractionTask}
+            />
           )}
         </div>
       </section>

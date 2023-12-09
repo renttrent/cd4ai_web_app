@@ -10,9 +10,10 @@ import { useMutation } from "@tanstack/react-query";
 import { SignUpRequestParams, signUp } from "@/util/auth/signup";
 import { Alert } from "@/components/ui/alert";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PulseLoader } from "react-spinners";
+import { AxiosError } from "axios";
 
 type SignUpState = {
   firstname: string;
@@ -30,9 +31,19 @@ const signUpSchema: ObjectSchema<SignUpState> = object({
 
 export default function Login() {
   const router = useRouter();
-  const { mutateAsync, isPending, isSuccess, isError, error } = useMutation({
+  const [error, setError] = useState<string | null>(null);
+  const { mutateAsync, isPending, isSuccess, isError } = useMutation({
     mutationFn: async (data: SignUpRequestParams) => {
       return signUp(data);
+    },
+    onError: (err: AxiosError) => {
+      const message = (err.response?.data as any)?.message;
+
+      if (message) {
+        setError(message);
+      } else {
+        setError("Please try again later");
+      }
     },
   });
   const { register, handleSubmit } = useValidatedForm({
@@ -59,11 +70,9 @@ export default function Login() {
         "w-full grid gap-2 shadow-xs px-4 py-6 border-2 border-gray-100 rounded-xl shadow-gray-300"
       )}
     >
-      {isError && (
+      {error && error?.length > 0 && (
         // @ts-ignore
-        <Alert variant="destructive">{`Sign Up Failed - ${JSON.stringify(
-          error
-        )}`}</Alert>
+        <Alert variant="destructive">{`Sign Up Failed: ${error}`}</Alert>
       )}
       <div className="flex flex-col gap-2 items-center">
         <span className="text-2xl font-semibold">Create new account</span>

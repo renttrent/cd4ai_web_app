@@ -49,6 +49,12 @@ export const getTasks = async (classId: string) => {
   return res.data.body as Task[];
 };
 
+export const getTask = async (taskId: string) => {
+  const res = await axios.get(`/task/${taskId}`);
+
+  return res.data.body as Task;
+};
+
 export const updateTask = async (taskId: string, data: any) => {
   const res = await axios.put(`/task/${taskId}`, data);
 

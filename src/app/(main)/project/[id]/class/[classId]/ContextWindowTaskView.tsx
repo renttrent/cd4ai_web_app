@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { ContextWindowsExtractionTask } from "@/util/task/tasks";
+import { ContextWindowsExtractionTask, getTask } from "@/util/task/tasks";
 import { array, object, string } from "yup";
 import { useUpdateTask } from "../_hooks/use-update-task";
 import { queryClient } from "@/util/query-client";
@@ -13,6 +13,7 @@ import { Popover, PopoverClose } from "@radix-ui/react-popover";
 import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
 
 type WindowsState = {
   final_windows: string[];
@@ -23,15 +24,27 @@ const windowsSchema = object({
 });
 
 export const ContextWindowTaskView = ({
-  task,
+  task: selectedTask,
 }: {
   task: ContextWindowsExtractionTask;
 }) => {
+  const { data, refetch } = useQuery({
+    queryKey: ["task", selectedTask.id],
+    queryFn: async () => {
+      const res = await getTask(selectedTask.id);
+      return res;
+    },
+    initialData: selectedTask,
+  });
+
+  console.log(data);
+  const selectedTaskData = data as ContextWindowsExtractionTask;
+
   const { handleSubmit, watch, setValue, reset, getValues, formState } =
     useValidatedForm({
       schema: windowsSchema,
       defaultValues: {
-        final_windows: task.result?.filtered_context_windows ?? [],
+        final_windows: selectedTaskData.result?.filtered_context_windows ?? [],
       },
     });
 
@@ -39,14 +52,14 @@ export const ContextWindowTaskView = ({
   const { isDirty } = formState;
 
   const invalidateTaskList = () => {
-    queryClient.invalidateQueries({ queryKey: ["taskList", task.class_id] });
+    queryClient.invalidateQueries({
+      queryKey: ["taskList", selectedTaskData.class_id],
+    });
   };
   const { mutateAsync: updateTask } = useUpdateTask();
 
   const { toast } = useToast();
   const final_windows = watch("final_windows");
-
-  const selectedTaskData = task;
 
   const unselected_extracted_windows = (
     selectedTaskData?.result?.extracted_context_windows ?? []
@@ -56,7 +69,7 @@ export const ContextWindowTaskView = ({
 
   const onSubmit = async (data: WindowsState) => {
     await updateTask({
-      taskId: task.id,
+      taskId: selectedTaskData.id,
       data: { result: { filtered_results: data.final_windows ?? [] } },
     });
     toast({
@@ -79,8 +92,8 @@ export const ContextWindowTaskView = ({
       className="w-full border rounded-sm mt-2 p-4"
     >
       <TaskInfo task={selectedTaskData} />
-      {task.result?.extracted_context_windows !== null &&
-        task.status == "completed" && (
+      {selectedTaskData.result?.extracted_context_windows !== null &&
+        selectedTaskData.status == "completed" && (
           <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
               <div className="text-lg font-bold">Extracted Windows</div>

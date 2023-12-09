@@ -37,6 +37,7 @@ export const TaskName = ({ task }: { task: Task }) => {
       queryClient.invalidateQueries({
         queryKey: ["context_windows_extraction_task", task.parent_id],
       });
+      queryClient.invalidateQueries({ queryKey: ["task", task.id] });
     }
     setIsEditing(false);
   };
@@ -46,7 +47,16 @@ export const TaskName = ({ task }: { task: Task }) => {
       {isEditing ? (
         <form className="font-bold" onSubmit={(e) => e.preventDefault()}>
           <div className="flex gap-2 items-center">
-            <Input size={40} className="h-9" {...register("name")} />
+            <Input
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                }
+              }}
+              size={40}
+              className="h-9"
+              {...register("name")}
+            />
             <LoadingButton
               disabled={isPending}
               isLoading={isPending}

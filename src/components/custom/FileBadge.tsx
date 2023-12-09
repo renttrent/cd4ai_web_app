@@ -28,7 +28,7 @@ export const FileBadge = ({ name, path }: { name: string; path: string }) => {
         <FilePreview path={path} />
       </Modal>
       <Badge
-        className="cursor-pointer flex gap-1"
+        className="cursor-pointer flex gap-1 hover:bg-blue-600"
         onClick={() => setIsOpen(true)}
       >
         <File size="15px" />

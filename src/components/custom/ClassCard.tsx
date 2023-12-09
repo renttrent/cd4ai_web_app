@@ -10,10 +10,7 @@ interface ClassCardProps {
 
 const ClassCard = ({ classItem }: ClassCardProps) => {
   return (
-    <Card
-      className=" hover:bg-gray-50 mb-4 p-4 flex flex-col"
-      style={{ minWidth: "200px" }}
-    >
+    <Card className=" hover:bg-gray-50 mb-4 p-4 flex flex-col min-w-[200px]">
       <div className="font-medium text-sm text-primary">Class</div>
 
       <div className="flex-grow">

@@ -55,8 +55,6 @@ export default function Login() {
     }
   }, [isSuccess]);
 
-  console.log("error");
-  console.log(isError, error);
   const params = useSearchParams();
   const { toast } = useToast();
   useEffect(() => {
