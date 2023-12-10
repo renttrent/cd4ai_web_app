@@ -85,12 +85,15 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
             {data?.name}
           </Link>
         </div>
-        <div className="flex flex-row justify-between items-center">
-          <div className="flex flex-row items-center text-2xl mt-2 mb-4 gap-4">
+        <div className="flex flex-row flex-wrap justify-between items-center">
+          <div className="flex-1 flex flex-row items-center text-2xl mt-2 mb-4 gap-4">
             <div className="font-bold  text-stone-900">{data?.name}</div>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => setIsCreateTaskFormOpen(true)}>
+            <Button
+              className="w-fit"
+              onClick={() => setIsCreateTaskFormOpen(true)}
+            >
               Create Keyword Extraction Task
             </Button>
           </div>
