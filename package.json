@@ -37,6 +37,7 @@
     "react-papaparse": "^4.4.0",
     "react-query": "^3.39.3",
     "react-spinners": "^0.13.8",
+    "react-tooltip": "^5.25.0",
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "yup": "^1.3.2"

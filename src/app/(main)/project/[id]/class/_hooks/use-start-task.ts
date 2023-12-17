@@ -12,7 +12,7 @@ export const useStartTask = (
       classId: string;
       data: StartTaskRequest;
     }) => {
-      return startTask(classId, data);
+      return startTask(classId, 'fast',data);
     },
     onSuccess,
   });

@@ -85,7 +85,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
         task.status == "completed" && (
           <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
-              <div className="text-lg font-bold">Extracted Keywords</div>
+              <div className="text-lg font-bold">Extracted Keywords ({selectedTaskData.result?.extracted_keywords_count})</div>
               <div className="max-w-sm">
                 <Input
                   placeholder="search keyword"

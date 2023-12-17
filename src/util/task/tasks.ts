@@ -9,11 +9,14 @@ export interface BaseTask {
   start_time: string;
   end_time: string;
   valid: boolean;
+  lang:"en" | "de";
+  execution_mod:"fast" | "precise";
 }
 
 export interface KeywordsExtractionTask extends BaseTask {
   type: "keywords extraction";
   result: {
+    extracted_keywords_count: number;
     extracted_keywords: string[];
     filtered_keywords: string[];
   } | null;

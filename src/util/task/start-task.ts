@@ -24,9 +24,10 @@ export type StartTaskRequest =
 
 export const startTask = async (
   classId: string,
+  execution_mod: string,
   data: StartTaskRequest
 ): Promise<StartTaskResponse> => {
-  const res = await axios.post(`/task/?class_id=${classId}`, data);
+  const res = await axios.post(`/task/?class_id=${classId}&execution_mod=${execution_mod}`, data);
 
   if (res.status === 200) {
     return {

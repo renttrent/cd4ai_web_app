@@ -2,7 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import 'react-tooltip/dist/react-tooltip.css';
 import { LoadingButton } from "@/components/ui/loadingbutton";
+import { Tooltip } from 'react-tooltip'
 import {
   Select,
   SelectContent,
@@ -18,7 +20,7 @@ import { getProject } from "@/util/projects/projects";
 import { TaskType, startTask } from "@/util/task/start-task";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { PlusIcon, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState,KeyboardEvent } from "react";
 import { useFieldArray } from "react-hook-form";
 import { ObjectSchema, array, object, string } from "yup";
 interface TaskCreationState {
@@ -44,9 +46,7 @@ const TaskCreationSchema: ObjectSchema<TaskCreationState> = object({
         }),
       })
     ).required(),
-    init_keywords: string()
-      .matches(/^[a-zA-Z ,]+$/)
-      .required(),
+    init_keywords: string().required(),
   }),
 });
 
@@ -57,6 +57,15 @@ export const CreateTaskForm = ({
   class: Class;
   onSuccess?: () => void;
 }) => {
+
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [executionMode, setExecutionMode] = useState('fast');
+
+  const handleModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setExecutionMode(event.target.value);
+  };
+
   const { register, handleSubmit, setValue, getValues, control } =
     useValidatedForm({
       schema: TaskCreationSchema,
@@ -64,10 +73,10 @@ export const CreateTaskForm = ({
         type: "keywords extraction",
         input: {
           files_to_consider: [],
-          init_keywords: "",
+          init_keywords: "", 
         },
       },
-    });
+  });
 
   const { fields, remove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
@@ -80,6 +89,26 @@ export const CreateTaskForm = ({
       file,
     ]);
   };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && inputValue) {
+      event.preventDefault();
+      const newKeyword = inputValue.trim();
+      if (newKeyword && !keywords.includes(newKeyword)) {
+        const newKeywords = [...keywords, newKeyword];
+        setKeywords(newKeywords);
+        setValue('input.init_keywords', newKeywords.join(', '), { shouldValidate: true });
+      }
+      setInputValue('');
+    }
+  };
+  
+  const removeKeyword = (index: number) => {
+    const newKeywords = keywords.filter((_, idx) => idx !== index);
+    setKeywords(newKeywords);
+    setValue('input.init_keywords', newKeywords.join(', '), { shouldValidate: true });
+  };
+
 
   const { data: projectData } = useQuery({
     queryKey: ["project", cl.project_id],
@@ -103,7 +132,7 @@ export const CreateTaskForm = ({
         },
       };
 
-      return startTask(cl.id, classData);
+      return startTask(cl.id, executionMode, classData);
     },
   });
 
@@ -111,8 +140,8 @@ export const CreateTaskForm = ({
     try {
       await mutateAsync(data);
       onSuccess?.();
-    } catch {
-      //ignore
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -121,6 +150,7 @@ export const CreateTaskForm = ({
       (f) => f.file_path == file.file_path
     );
   });
+
   return (
     <div className="">
       <div className="font-bold text-xl">Start Keyword Extraction</div>
@@ -140,11 +170,10 @@ export const CreateTaskForm = ({
           type="text"
           autoCapitalize="none"
           autoCorrect="off"
-          // disabled={isPending}
         />
         {!!availableFiles?.length && (
           <div className="flex flex-col gap-2">
-            <Label>Available Files</Label>
+            <Label>Select Files</Label>
             <div className="flex gap-2">
               {(availableFiles ?? []).map((file, index) => (
                 <Button
@@ -161,7 +190,6 @@ export const CreateTaskForm = ({
             </div>
           </div>
         )}
-        <Label>Selected Files</Label>
 
         {fields.map((field, index) => {
           return (
@@ -198,17 +226,76 @@ export const CreateTaskForm = ({
             </div>
           );
         })}
-        <Label htmlFor="init_keywords">Init Keywords</Label>
-        <Input
-          {...register("input.init_keywords")}
-          id="init_keywords"
-          placeholder="Init Keywords "
-          type="text"
-          autoCapitalize="none"
-          autoCorrect="off"
-          // disabled={isPending}
-        />
-        <span className="text-xs text-gray-300">seperated by commas</span>
+        <>
+          <div className="flex items-center">
+            <Label className="mr-4">
+              Execution Mode
+            </Label>
+            <div className="flex items-center">
+              <label 
+                data-tooltip-id="my-tooltip" 
+                data-tooltip-content="Fast mode processes quickly with less precision" 
+                htmlFor="exec-fast" 
+                className="flex items-center mr-2">
+                <input
+                  type="radio"
+                  id="exec-fast"
+                  name="executionMode"
+                  value="fast"
+                  checked={executionMode === 'fast'}
+                  onChange={handleModeChange}
+                  className="mr-1"
+                  data-tip data-for="fastTip"
+                />
+                Fast
+              </label>
+              <Tooltip id="my-tooltip" />
+              <label 
+                data-tooltip-id="my-tooltip" 
+                data-tooltip-content="Precise mode processes with high accuracy but may be slower"
+                htmlFor="exec-precise" className="flex items-center">
+                <input
+                  type="radio"
+                  id="exec-precise"
+                  name="executionMode"
+                  value="precise"
+                  checked={executionMode === 'precise'}
+                  onChange={handleModeChange}
+                  className="mr-1"
+                  data-tip data-for="preciseTip"
+                />
+                Precise
+              </label>
+            </div>
+          </div>
+        </>
+        
+        
+        <Label>Initial Keywords</Label>
+        <div>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Enter a keyword and press Enter"
+            style={{
+              padding: '8px', 
+              margin: '2px', 
+              border: '1px solid', 
+              borderRadius: '4px',
+              width: '100%'
+            }}
+          />
+          <div className="tags-container" style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {keywords.map((keyword, index) => (
+              <span key={index} className="tag" style={{ paddingLeft: "5px",padding: '5px', margin: '4px', background: '#E2E8F0', borderRadius: '50px', display: 'inline-flex', alignItems: 'center' }}>
+                {keyword}
+                <button type="button" onClick={() => removeKeyword(index)} style={{ marginLeft: '10px', background: 'transparent', border: 'none' }}>×</button>
+              </span>
+            ))}
+          </div>
+        </div>
         <LoadingButton disabled={isPending} isLoading={isPending}>
           Submit
         </LoadingButton>

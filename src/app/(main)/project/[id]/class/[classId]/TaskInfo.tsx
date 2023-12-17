@@ -31,17 +31,20 @@ export const TaskInfo = ({ task }: { task: Task }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="text-2xl">
-        <span className="font-bold">{task.type}</span>
+        <span className="font-bold">{task.type.toUpperCase()}</span>
       </div>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col font-medium text-lg">
           {task.name && (
             <div className="flex gap-1 items-center">
-              <span>Task Name :</span> <TaskName task={task} />
+              <span>Task Name: </span> <TaskName task={task} />
             </div>
           )}
         </div>
-
+        {selectedTaskData.type == "keywords extraction"? 
+          <div className="text-black">Execution Mode: {selectedTaskData?.execution_mod.toUpperCase()}</div>:<></>
+        }
+        <div className="text-black">Language: {selectedTaskData?.lang.toUpperCase()}</div>
         <div
           className={cn(
             "flex flex-row gap-4 items-center font-bold",
@@ -52,7 +55,8 @@ export const TaskInfo = ({ task }: { task: Task }) => {
               : "text-red-500"
           )}
         >
-          <div>{selectedTaskData?.status}</div>
+          
+          <div>{selectedTaskData?.status.toUpperCase()}</div>
 
           {selectedTaskData?.status === "in progress" && (
             <>
