@@ -17,19 +17,28 @@ type createProjectParams = {
   name: string;
   description: string;
   files: File[] | null;
+  language : "en" | "de";
 };
 export const createProject = async (data: createProjectParams) => {
+  console.log(data);
+
   const fomrmData = new FormData();
   fomrmData.append("name", data.name);
   fomrmData.append("description", data.description);
+  fomrmData.append("language", data.language);
+  
   (data.files ?? []).forEach((file) => {
     fomrmData.append("files", file);
   });
-
-  const res = await axios.post("/project", fomrmData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return res.data.body;
+  
+  try {
+    const res = await axios.post("/project", fomrmData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data.body;
+  } catch (error) {
+    console.error("Error submitting form:", error);
+  }
 };

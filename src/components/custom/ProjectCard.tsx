@@ -17,7 +17,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
   return (
     <Card className="flex flex-col gap-1 p-4 hover:bg-gray-50">
-      <div className="font-medium text-sm text-primary">Project</div>
+      <div className="font-medium text-sm text-primary">Project <span className="font-bold text-sm">({project.lang.toUpperCase()})</span></div>
       <div className="flex justify-between">
         <div className="font-bold text-md">{project.name}</div>
         <div className="text-sm opacity-70">
