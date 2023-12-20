@@ -6,12 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "@/util/projects/projects";
 import { BarLoader } from "react-spinners";
 import colors from "tailwindcss/colors";
-import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+import { deleteProject} from "@/util/projects/projects";
 
 export const LatestProjectsView = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: projects, isLoading } = useQuery({
+  const { data: projects, isLoading, refetch: refetchProjects } = useQuery({
     queryKey: ["projects"],
     queryFn: getProjects,
   });
@@ -21,6 +22,17 @@ export const LatestProjectsView = () => {
       project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const { mutateAsync: mutateDeleteProject } = useMutation({
+    mutationFn: async (project_id: string) => {
+      return deleteProject(project_id);
+    },
+  });
+
+  const onDeleteProjectPress = async (projectId: string) => {
+    await mutateDeleteProject(projectId);
+    refetchProjects(); 
+  };
 
   return (
     <div className="flex flex-col gap-4 mt-6">
@@ -46,9 +58,7 @@ export const LatestProjectsView = () => {
       )}
       <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-4 ">
         {filteredProjects.map((project) => (
-          <Link href={`/project/${project.id}`} key={project.id}>
-            <ProjectCard project={project} />
-          </Link>
+        <ProjectCard project={project} onDeletePress={() => onDeleteProjectPress(project.id)}/>
         ))}
       </div>
     </div>

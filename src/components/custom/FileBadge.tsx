@@ -14,12 +14,20 @@ import {
 } from "../ui/table";
 import { parseCsvAsync } from "@/lib/utils";
 
-export const FileBadge = ({ name, path }: { name: string; path: string }) => {
+export const FileBadge = ({ name, path, onDelete }: { name: string; path: string; onDelete?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete();
+      setIsDeleted(true);
+    }
+  };
 
   return (
     <div>
-      <Modal
+      {!isDeleted && (<Modal
         className="h-[85%] w-[90%] max-w-none flex flex-col"
         title="File Preview"
         open={isOpen}
@@ -27,13 +35,13 @@ export const FileBadge = ({ name, path }: { name: string; path: string }) => {
       >
         <FilePreview path={path} />
       </Modal>
-      <Badge
-        className="cursor-pointer flex gap-1 hover:bg-blue-600"
-        onClick={() => setIsOpen(true)}
-      >
+      )}
+      {!isDeleted && (<Badge className="cursor-pointer flex gap-1 hover:bg-blue-600">
         <File size="15px" />
-        <span>{name}</span>
+        <span onClick={() => setIsOpen(true)}>{name}</span>
+        {onDelete && <span onClick={handleDelete}>&times; </span>}
       </Badge>
+      )}
     </div>
   );
 };
