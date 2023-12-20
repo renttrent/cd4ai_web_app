@@ -33,14 +33,18 @@ export const createClass = async (
 };
 
 export const deleteClass = async (classId: string): Promise<void> => {
-  return await axios.delete(`/class?class_id=${classId}`);
+  return await axios.delete(`/class/${classId}`);
 };
 
 export const updateClass = async (
   classId: string,
   classData: Omit<Partial<Class>, "extracted_keywords">
 ): Promise<Class> => {
-  return await axios.put(`/class?class_id=${classId}`, classData);
+  return await axios.put(`/class/${classId}`, classData, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
 };
 
 export const markClassAsFavorite = async (

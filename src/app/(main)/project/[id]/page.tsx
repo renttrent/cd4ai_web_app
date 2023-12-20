@@ -1,22 +1,19 @@
 "use client";
 
 import { getProject } from "@/util/projects/projects";
-import { useQueries } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import Link from "next/link";
 import { BarLoader } from "react-spinners";
 import { FaChevronRight } from "react-icons/fa";
 import { IoMdAddCircle } from "react-icons/io";
-import { MdEdit } from "react-icons/md";
 import { useEffect, useState } from "react";
 import ClassCard from "@/components/custom/ClassCard";
-import { getClassesByProjectId } from "@/util/classes/classes";
-import { CreateClassForm } from "./class/_ui/CreateClassForm";
+import { deleteClass, getClassesByProjectId } from "@/util/classes/classes";
 import { useRouter } from "next/navigation";
-import { XIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { Modal } from "@/components/custom/Modal";
 import { FileBadge } from "@/components/custom/FileBadge";
+import { ClassForm } from "./class/_ui/ClassForm";
 
 const Skeleton = () => {
   // TODO
@@ -31,6 +28,9 @@ const Page = ({
   };
 }) => {
   const [showCreateClass, setShowCreateClass] = useState(false);
+  const [editingClassIndex, setEditingClassIndex] = useState<number | null>(
+    null
+  );
 
   const nav = useRouter();
   const [projectQuery, classQuery] = useQueries({
@@ -56,10 +56,20 @@ const Page = ({
     setClasses(classQuery.data ?? []);
   }, [projectQuery, classQuery]);
 
+  const { mutateAsync: mutateDeleteClass } = useMutation({
+    mutationFn: async (classId: string) => {
+      return deleteClass(classId);
+    },
+  });
+
+  const onDeleteClassPress = async (classId: string) => {
+    await mutateDeleteClass(classId);
+    classQuery.refetch();
+  };
+
   if (isLoading) {
     return <Skeleton />;
   }
-
   if (!project) {
     return <div>Project not found</div>;
   }
@@ -116,7 +126,8 @@ const Page = ({
         open={showCreateClass}
         onClose={() => setShowCreateClass(false)}
       >
-        <CreateClassForm
+        <ClassForm
+          editable={false}
           onSuccess={() => {
             classQuery.refetch();
             setShowCreateClass(false);
@@ -124,12 +135,32 @@ const Page = ({
           projectId={project.id}
         />
       </Modal>
+      <Modal
+        className="max-w-xl"
+        open={editingClassIndex !== null}
+        onClose={() => setEditingClassIndex(null)}
+      >
+        <ClassForm
+          editable
+          classId={classes[editingClassIndex ?? 0]?.id}
+          onSuccess={() => {
+            classQuery.refetch();
+            setEditingClassIndex(null);
+          }}
+          initialData={classes[editingClassIndex ?? 0]}
+        />
+      </Modal>
       {!!classes.length && (
         <div className="mt-8 font-bold text-lg">Project Classes </div>
       )}
       <div className="mt-8">
         {classes.map((classItem: any, index: number) => (
-          <ClassCard key={index} classItem={classItem} />
+          <ClassCard
+            onEditPress={() => setEditingClassIndex(index)}
+            onDeletePress={() => onDeleteClassPress(classItem.id)}
+            key={index}
+            classItem={classItem}
+          />
         ))}
       </div>
     </div>
