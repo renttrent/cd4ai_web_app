@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { getClassById } from "@/util/classes/classes";
 import { useQuery } from "@tanstack/react-query";
-import { BarLoader, MoonLoader } from "react-spinners";
+import { BarLoader } from "react-spinners";
 import { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { formatDate, getFileName } from "@/lib/utils";
@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/tooltip";
 import { CornerDownRight, Loader2 } from "lucide-react";
 import { ContextWindowTaskView } from "./ContextWindowTaskView";
-import { set } from "react-hook-form";
 
 export const ClassDetailView = ({ classId }: { classId: string }) => {
   const { data, isLoading } = useQuery({
@@ -72,96 +71,102 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
   }
 
   return (
-    <div className="flex flex-row  flex-wrap ">
-      <section className="flex-1">
-        <div className="flex flex-row items-center gap-2 p-2 my-2 w-fit">
-          <Link href="/" className="font-bold">
-            Dashboard
-          </Link>
-          <FaChevronRight />
-          <Link href={`/project/${data?.project_id}`}>Project</Link>
-          <FaChevronRight />
-          <Link href={`/project/${data?.project_id}/class/${data?.id}`}>
-            {data?.name}
-          </Link>
-        </div>
-        <div className="flex flex-row flex-wrap justify-between items-center">
-          <div className="flex-1 flex flex-row items-center text-2xl mt-2 mb-4 gap-4">
-            <div className="font-bold  text-stone-900">{data?.name}</div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              className="w-fit"
-              onClick={() => setIsCreateTaskFormOpen(true)}
-            >
-              Create Keyword Extraction Task
-            </Button>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="italic text-stone-500">
-            Last Updated: {formatDate(data?.modification_time ?? "")}
-          </div>
-          <div className="text-gray-500  font-medium">{data?.description}</div>
-        </div>
-        <div className="mt-10">
-          {selectedTask !== null && taskListData && taskListData.length > 0 ? (
-            <TaskView
-              key={taskListData[selectedTask].id}
-              task={taskListData[selectedTask] as KeywordsExtractionTask}
-            />
-          ) : !selectedWindowExtractionTask ? (
-            <div>No task selected</div>
-          ) : (
-            ""
-          )}
-
-          {selectedWindowExtractionTask && selectedTask == null && (
-            <ContextWindowTaskView
-              key={selectedWindowExtractionTask.id}
-              task={selectedWindowExtractionTask}
-            />
-          )}
-        </div>
-      </section>
-      <div className="basis-96">
-        <section className="w-[300px] xl:fixed max-h-screen   mb-40 border border-slate-400 rounded-md bg-slate-100 ml-10 p-4 drop-shadow-lg  right-4 m-4 top-0  overflow-y-auto">
-          <div className="font-bold text-center">Tasks</div>
-          {taskListData && taskListData.length > 0 && (
-            <div>
-              {taskListData.map((task, index) => (
-                <TaskAccordion
-                  task={task as KeywordsExtractionTask}
-                  key={task.id}
-                  index={index}
-                  selected={index == selectedTask}
-                  onClick={() => setSelectedTask(index)}
-                  onChildrenClick={(task) => {
-                    setSelectedWindowExtractionTask(
-                      task as ContextWindowsExtractionTask
-                    );
-                    setSelectedTask(null);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+    <div>
+      <div className="flex flex-row items-center gap-2 my-4 w-fit">
+        <Link href="/" className="font-bold">
+          Dashboard
+        </Link>
+        <FaChevronRight />
+        <Link href={`/project/${data?.project_id}`}>Project</Link>
+        <FaChevronRight />
+        <Link href={`/project/${data?.project_id}/class/${data?.id}`}>
+          {data?.name}
+        </Link>
       </div>
-      <Modal
-        open={isCreateTaskFormOpen}
-        onClose={() => setIsCreateTaskFormOpen(false)}
-      >
-        {data && (
-          <CreateTaskForm
-            onSuccess={() => {
-              setIsCreateTaskFormOpen(false);
-              taskListRefetch();
-            }}
-            class={data}
-          />
-        )}
-      </Modal>
+      <div className="flex flex-row  flex-wrap">
+        <section className="flex-1">
+          <div className="flex flex-row flex-wrap justify-between items-center">
+            <div className="flex-1 flex flex-row items-center text-2xl mt-2 mb-4 gap-4">
+              <div className="font-bold  text-stone-900">{data?.name}</div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                className="w-fit"
+                onClick={() => setIsCreateTaskFormOpen(true)}
+              >
+                Create Keyword Extraction Task
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="italic text-stone-500">
+              Last Updated: {formatDate(data?.modification_time ?? "")}
+            </div>
+            <div className="text-gray-500  font-medium">
+              {data?.description}
+            </div>
+          </div>
+          <div className="mt-10">
+            {selectedTask !== null &&
+            taskListData &&
+            taskListData.length > 0 ? (
+              <TaskView
+                key={taskListData[selectedTask].id}
+                task={taskListData[selectedTask] as KeywordsExtractionTask}
+              />
+            ) : !selectedWindowExtractionTask ? (
+              <div>No task selected</div>
+            ) : (
+              ""
+            )}
+
+            {selectedWindowExtractionTask && selectedTask == null && (
+              <ContextWindowTaskView
+                key={selectedWindowExtractionTask.id}
+                task={selectedWindowExtractionTask}
+              />
+            )}
+          </div>
+        </section>
+        <div className="basis-96">
+          <section className="w-5/6 m-auto p-4 overflow-y-auto border-l">
+            <div className="font-bold text-xl">Tasks</div>
+            {taskListData && taskListData.length > 0 && (
+              <div>
+                {taskListData.map((task, index) => (
+                  <TaskAccordion
+                    task={task as KeywordsExtractionTask}
+                    key={task.id}
+                    index={index}
+                    selected={index == selectedTask}
+                    onClick={() => setSelectedTask(index)}
+                    onChildrenClick={(task) => {
+                      setSelectedWindowExtractionTask(
+                        task as ContextWindowsExtractionTask
+                      );
+                      setSelectedTask(null);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+        <Modal
+          open={isCreateTaskFormOpen}
+          onClose={() => setIsCreateTaskFormOpen(false)}
+        >
+          {data && (
+            <CreateTaskForm
+              onSuccess={() => {
+                setIsCreateTaskFormOpen(false);
+                taskListRefetch();
+              }}
+              class={data}
+            />
+          )}
+        </Modal>
+      </div>
     </div>
   );
 };
@@ -239,7 +244,7 @@ const TaskChildrenList = ({
   return (
     <div className="flex flex-col gap-2">
       {data?.map((task, index) => (
-        <div className="flex items-center gap-2">
+        <div key={index} className="flex items-center gap-2">
           <CornerDownRight className="text-gray-500" />
           <TaskButton
             task={task}
@@ -265,7 +270,7 @@ const TaskButton = ({
     <div
       onClick={() => onClick(task)}
       className={`flex flex-row gap-2 text-sm w-full items-center ${
-        selected ? "text-indigo-500" : "text-black"
+        selected ? "text-blue-500" : "text-black"
       }  rounded-md   cursor-pointer font-medium`}
     >
       {task.status === "in progress" ? (

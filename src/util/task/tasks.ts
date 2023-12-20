@@ -9,8 +9,8 @@ export interface BaseTask {
   start_time: string;
   end_time: string;
   valid: boolean;
-  lang:"en" | "de";
-  execution_mod:"fast" | "precise";
+  lang: "en" | "de";
+  execution_mod: "fast" | "precise";
 }
 
 export interface KeywordsExtractionTask extends BaseTask {
@@ -74,6 +74,12 @@ export const getChildrenTasks = async (taskId: string) => {
   const res = await axios.get(`/task/children/${taskId}/`);
 
   return res.data.body as Task[];
+};
+
+export const validateTask = async (taskId: string) => {
+  const res = await axios.post(`/task/validate/${taskId}`);
+
+  return res.data.body as Task;
 };
 
 export type TaskResult = {

@@ -1,7 +1,6 @@
 import { Task } from "@/util/task/tasks";
 import { TaskName } from "./TaskName";
-import { cn, formatDate, getFileName } from "@/lib/utils";
-import { MoonLoader } from "react-spinners";
+import { cn, formatDate, getFileName, shortFormatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { d } from "@/util/dayjs";
 import { queryClient } from "@/util/query-client";
@@ -10,6 +9,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { FileBadge } from "@/components/custom/FileBadge";
 import { Loader2 } from "lucide-react";
+import { AiFillThunderbolt } from "react-icons/ai";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const TaskInfo = ({ task }: { task: Task }) => {
   const selectedTaskData = task;
@@ -30,21 +36,29 @@ export const TaskInfo = ({ task }: { task: Task }) => {
   );
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-2xl">
-        <span className="font-bold">{task.type.toUpperCase()}</span>
-      </div>
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-col font-medium text-lg">
-          {task.name && (
-            <div className="flex gap-1 items-center">
-              <span>Task Name: </span> <TaskName task={task} />
+      <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center gap-4">
+          <div className="text-2xl">
+            <span className="font-bold">{task.type.toUpperCase()}</span>
+          </div>
+          {selectedTaskData.type == "keywords extraction" && (
+            <div className="text-yellow-500">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AiFillThunderbolt />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div>Fast Execution Mode</div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
+          <Badge className="bg-slate-200 text-gray-800 hover:bg-slate-200 hover:text-gray-800">
+            {selectedTaskData?.lang.toUpperCase()}
+          </Badge>
         </div>
-        {selectedTaskData.type == "keywords extraction"? 
-          <div className="text-black">Execution Mode: {selectedTaskData?.execution_mod.toUpperCase()}</div>:<></>
-        }
-        <div className="text-black">Language: {selectedTaskData?.lang.toUpperCase()}</div>
         <div
           className={cn(
             "flex flex-row gap-4 items-center font-bold",
@@ -55,7 +69,6 @@ export const TaskInfo = ({ task }: { task: Task }) => {
               : "text-red-500"
           )}
         >
-          
           <div>{selectedTaskData?.status.toUpperCase()}</div>
 
           {selectedTaskData?.status === "in progress" && (
@@ -80,21 +93,29 @@ export const TaskInfo = ({ task }: { task: Task }) => {
           )}
         </div>
       </div>
-      <div className="flex flex-row items-center justify-between text-sm my-4 italic">
-        <div>Started at - {formatDate(selectedTaskData?.start_time ?? "")}</div>
-        <div>Estimated Time - {durationParsed}</div>
-        {selectedTaskData?.end_time && (
-          <div>Ended at - {formatDate(selectedTaskData?.end_time ?? "")}</div>
-        )}
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-col font-medium text-lg">
+          {task.name && (
+            <div className="flex gap-1 items-center">
+              <span>Task Name: </span> <TaskName task={task} />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-row gap-4 text-sm my-4 italic">
+          <div>
+            Started - {shortFormatDate(selectedTaskData?.start_time ?? "")}
+          </div>
+          {selectedTaskData?.end_time && <div>Duration - {durationParsed}</div>}
+        </div>
       </div>
-      <div className="flex flex-row justify-between flex-wrap">
+      <div className="flex flex-row justify-between">
         <div className="flex-1 ">
           <div className="text-lg font-bold">
             {selectedTaskData.type == "keywords extraction"
               ? "Initial Keywords"
               : "Filtered Keywords"}
           </div>
-          <div className="flex flex-row gap-2 flex-wrap">
+          <div className="flex flex-row gap-2 my-1">
             {(selectedTaskData.type == "keywords extraction"
               ? selectedTaskData?.input.init_keywords
               : selectedTaskData.input.filtered_keywords
@@ -103,9 +124,9 @@ export const TaskInfo = ({ task }: { task: Task }) => {
             ))}
           </div>
         </div>
-        <div className="flex-1 px-2">
+        <div className="flex-2 px-2">
           <div className="text-lg font-bold">Considered Files</div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 my-1">
             {selectedTaskData.input.files_to_consider.map((file, index) => (
               <div key={index} className="flex flex-row gap-2 flex-wrap">
                 <FileBadge

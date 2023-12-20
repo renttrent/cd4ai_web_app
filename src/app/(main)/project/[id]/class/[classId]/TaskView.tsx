@@ -1,20 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useValidatedForm } from "@/hooks/use-validated-form";
-import { cn, formatDate, getFileName } from "@/lib/utils";
-import { KeywordsExtractionTask, Task } from "@/util/task/tasks";
+import { KeywordsExtractionTask, validateTask } from "@/util/task/tasks";
 import { array, object, string } from "yup";
 import { useUpdateTask } from "../_hooks/use-update-task";
 import { queryClient } from "@/util/query-client";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { d } from "@/util/dayjs";
 import { useStartTask } from "../_hooks/use-start-task";
-import { ClipLoader, MoonLoader, PulseLoader } from "react-spinners";
-import { useCancelTask } from "../_hooks/use-cancel_task";
 import { useToast } from "@/components/ui/use-toast";
-import { FileBadge } from "@/components/custom/FileBadge";
-import { TaskName } from "./TaskName";
 import { TaskInfo } from "./TaskInfo";
 
 type KeywordsState = {
@@ -44,7 +38,6 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
 
   const { toast } = useToast();
   const { mutateAsync: StartTask } = useStartTask(() => {
-    // invalidateTaskList();
     queryClient.invalidateQueries({
       queryKey: ["context_windows_extraction_task", task.id],
     });
@@ -74,18 +67,29 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
     reset(getValues());
   };
 
+  const makeValid = async () => {
+    await validateTask(task.id);
+  };
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="w-full border rounded-sm mt-2 p-4"
     >
       <TaskInfo task={selectedTaskData} />
-      <div className="bg-gray-200 h-0.5 w-full my-4" />
+      <div className="w-full border-b my-4" />
       {task.result?.extracted_keywords !== null &&
         task.status == "completed" && (
           <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
-              <div className="text-lg font-bold">Extracted Keywords ({selectedTaskData.result?.extracted_keywords_count})</div>
+              <div className="text-lg font-bold">
+                Extracted Keywords
+                {selectedTaskData.result?.extracted_keywords_count && (
+                  <span className="ml-1">
+                    ({selectedTaskData.result?.extracted_keywords_count})
+                  </span>
+                )}
+              </div>
               <div className="max-w-sm">
                 <Input
                   placeholder="search keyword"
@@ -93,7 +97,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
               </div>
-              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto">
+              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto no-scrollbar">
                 {unselected_extracted_keywords.map((keyword, index) => (
                   <Badge
                     key={index}
@@ -144,7 +148,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
             </div>
           </div>
         )}
-      <div className="text-right  mt-2">
+      <div className="mt-2 flex flex-row gap-2 items-center w-fit ml-auto">
         {!isDirty &&
           selectedTaskData.status === "completed" &&
           !!selectedTaskData.result?.filtered_keywords.length && (
@@ -164,6 +168,16 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
               Start New Context Window Extraction
             </Button>
           )}
+
+        {!task.valid && (
+          <Button
+            type="button"
+            className="bg-emerald-500 hover:bg-emerald-600"
+            onClick={() => makeValid()}
+          >
+            Make Valid
+          </Button>
+        )}
 
         {isDirty && (
           <Button
