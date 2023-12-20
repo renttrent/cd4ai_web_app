@@ -124,7 +124,7 @@ export const TaskInfo = ({ task }: { task: Task }) => {
             ))}
           </div>
         </div>
-        <div className="flex-2 px-2">
+        <div className="flex-1 ml-8 px-2">
           <div className="text-lg font-bold">Considered Files</div>
           <div className="flex flex-col gap-2 my-1">
             {selectedTaskData.input.files_to_consider.map((file, index) => (

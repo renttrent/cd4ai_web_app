@@ -74,13 +74,12 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full border rounded-sm mt-2 p-4"
+      className="w-full border-4 rounded-sm mt-2 p-4"
     >
       <TaskInfo task={selectedTaskData} />
-      <div className="w-full border-b my-4" />
       {task.result?.extracted_keywords !== null &&
         task.status == "completed" && (
-          <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
+          <div className="flex flex-row justify-between mt-4 gap-4">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
               <div className="text-lg font-bold">
                 Extracted Keywords
@@ -90,14 +89,14 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
                   </span>
                 )}
               </div>
-              <div className="max-w-sm">
+              <div className="w-full">
                 <Input
-                  placeholder="search keyword"
+                  placeholder="Search Keyword"
                   className="h-6"
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
               </div>
-              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto no-scrollbar">
+              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto no-scrollbar border rounded-md p-2 hover:shadow-md">
                 {unselected_extracted_keywords.map((keyword, index) => (
                   <Badge
                     key={index}
@@ -125,26 +124,28 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
               </div>
-              <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto">
-                {final_words.map((keyword, index) => (
-                  <Badge
-                    key={index}
-                    className="w-fit cursor-pointer hover:bg-red-500 hover:text-white text-white bg-primary"
-                    variant="secondary"
-                    onClick={() =>
-                      setValue(
-                        "final_keywords",
-                        final_words.filter((word) => word !== keyword),
-                        {
-                          shouldDirty: true,
-                        }
-                      )
-                    }
-                  >
-                    {keyword}
-                  </Badge>
-                ))}
-              </div>
+              {final_words.length > 0 && (
+                <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto no-scrollbar rounded-md border p-2 hover:shadow-md">
+                  {final_words.map((keyword, index) => (
+                    <Badge
+                      key={index}
+                      className="w-fit cursor-pointer hover:bg-red-500 hover:text-white text-white bg-primary"
+                      variant="secondary"
+                      onClick={() =>
+                        setValue(
+                          "final_keywords",
+                          final_words.filter((word) => word !== keyword),
+                          {
+                            shouldDirty: true,
+                          }
+                        )
+                      }
+                    >
+                      {keyword}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

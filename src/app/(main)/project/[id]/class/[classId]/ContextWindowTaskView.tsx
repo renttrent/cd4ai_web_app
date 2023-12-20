@@ -89,22 +89,22 @@ export const ContextWindowTaskView = ({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full border rounded-sm mt-2 p-4"
+      className="w-full border-4 rounded-sm mt-2 p-4"
     >
       <TaskInfo task={selectedTaskData} />
       {selectedTaskData.result?.extracted_context_windows !== null &&
         selectedTaskData.status == "completed" && (
-          <div className="flex flex-row justify-between mt-4 gap-4  divide-x-2">
+          <div className="flex flex-row justify-between mt-4 gap-4">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
               <div className="text-lg font-bold">Extracted Windows</div>
-              <div className="max-w-sm">
+              <div className="w-full">
                 <Input
-                  placeholder="search window"
+                  placeholder="Search Window"
                   className="h-6"
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
               </div>
-              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto">
+              <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto no-scrollbar rounded-md p-2 border hover:shadow-md">
                 {unselected_extracted_windows.map((window, index) => (
                   <Badge
                     key={index}
@@ -125,42 +125,44 @@ export const ContextWindowTaskView = ({
               <div className="text-left text-lg font-bold">
                 Filtered Windows
               </div>
-              <div className="max-w-sm invisible">
+              <div className="invisible">
                 <Input
                   placeholder="search keyword"
                   className="h-6"
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
               </div>
-              <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto">
-                {final_windows.map((window, index) => (
-                  <Popover key={index}>
-                    <PopoverTrigger>
-                      <Badge
-                        key={index}
-                        className=" cursor-pointer hover:bg-blue-500 hover:text-white text-white bg-primary"
-                        variant="secondary"
-                      >
-                        <span>{window}</span>
-                      </Badge>
-                    </PopoverTrigger>
+              {final_windows.length > 0 && (
+                <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto no-scrollbar border rounded-md p-2 hover:shadow-md">
+                  {final_windows.map((window, index) => (
+                    <Popover key={index}>
+                      <PopoverTrigger>
+                        <Badge
+                          key={index}
+                          className=" cursor-pointer hover:bg-blue-500 hover:text-white text-white bg-primary"
+                          variant="secondary"
+                        >
+                          <span>{window}</span>
+                        </Badge>
+                      </PopoverTrigger>
 
-                    <EditPopoverContent
-                      onRemovePress={() => {
-                        setValue(
-                          "final_windows",
-                          final_windows.filter((word) => word !== window),
-                          {
-                            shouldDirty: true,
-                          }
-                        );
-                      }}
-                      onChange={(value) => renameWindow(value, index)}
-                      value={window}
-                    />
-                  </Popover>
-                ))}
-              </div>
+                      <EditPopoverContent
+                        onRemovePress={() => {
+                          setValue(
+                            "final_windows",
+                            final_windows.filter((word) => word !== window),
+                            {
+                              shouldDirty: true,
+                            }
+                          );
+                        }}
+                        onChange={(value) => renameWindow(value, index)}
+                        value={window}
+                      />
+                    </Popover>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
