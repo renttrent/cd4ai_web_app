@@ -29,6 +29,11 @@ import { FileBadge } from "@/components/custom/FileBadge";
     const [CSVs, setCSVs] = useState<File[]>([]);
     const [deletedFiles, setDeletedFiles] = useState<string>('');
     console.log("deletedFiles: "  + deletedFiles);
+    const [formValues, setFormValues] = useState({
+      name: project?.name || '',
+      description: project?.description || '',
+    });
+  
 
     const handleDeleteFile = (deletedFilePath: string) => {
       setDeletedFiles((prevDeletedFiles) => deletedFiles.length > 0 ? prevDeletedFiles += "," + deletedFilePath : deletedFilePath);
@@ -72,10 +77,29 @@ import { FileBadge } from "@/components/custom/FileBadge";
       }
     };
   
+    const resetFormState = () => {
+      setFormValues({
+        name: project?.name || '',
+        description: project?.description || '',
+      });
+      setFiles([]);
+      setDeletedFiles('');
+    };
+  
+    const handleCloseModal = () => {
+      resetFormState();
+      setIsOpen(false);
+    };
+  
+    const handleOpenModal = () => {
+      resetFormState();
+      setIsOpen(true);
+    };
+
     return (
       <>
         <Button 
-            onClick={() => setIsOpen(true)} 
+            onClick={handleOpenModal} 
             variant="outline">
             Edit Project
         </Button>
@@ -84,7 +108,7 @@ import { FileBadge } from "@/components/custom/FileBadge";
           open={isOpen}
           title="Edit Project"
           description="Update your project details here. Click Save Changes when you're done."
-          onClose={() => setIsOpen(false)}
+          onClose={handleCloseModal}
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 py-4">
