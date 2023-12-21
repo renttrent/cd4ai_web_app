@@ -43,7 +43,7 @@ export const TaskInfo = ({ task }: { task: Task }) => {
             <span className="font-bold">{task.type.toUpperCase()}</span>
           </div>
           {selectedTaskData.execution_mod === "fast" && (
-            <div className="text-yellow-500">
+            <div className="text-yellow-500 mt-1">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -57,7 +57,7 @@ export const TaskInfo = ({ task }: { task: Task }) => {
             </div>
           )}
           {selectedTaskData.execution_mod === "precise" && (
-            <div className="text-emerald-500">
+            <div className="text-emerald-500 mt-1">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>

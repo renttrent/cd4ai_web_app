@@ -174,7 +174,8 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
         {!task.valid && (
           <Button
             type="button"
-            className="bg-emerald-500 hover:bg-emerald-600"
+            variant="outline"
+            className="border-green-800 text-green-800 border-2 hover:bg-green-100 hover:text-green-900"
             onClick={() => makeValid()}
           >
             Make Valid
@@ -184,7 +185,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
         {isDirty && (
           <Button
             type="submit"
-            className="bg-yellow-400 text-black hover:text-white"
+            className="bg-yellow-400 text-black hover:text-white hover:bg-yellow-600"
           >
             Save Changes
           </Button>
