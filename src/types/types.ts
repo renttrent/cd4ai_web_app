@@ -2,7 +2,7 @@ export interface Project {
   id: string;
   project_id: string;
   name: string;
-  lang: string;
+  lang: "string";
   description: string;
   modification_time: string;
   files: {

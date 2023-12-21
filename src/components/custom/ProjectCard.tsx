@@ -51,11 +51,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDeletePress
       <div className="flex gap-0.5 items-center">
             <Paperclip size="10px" />
             <div>
-              {project.files.length
-                ? project.files.length == 1
-                  ? "1 file"
-                  : `{project.files.length} files`
-                : null}
+              {project.files.length > 1 ? project.files.length + " files" : project.files.length > 0 ? "1 file" : null}
             </div>
       </div>
       <div className="text-sm text-gray-500 line-clamp-3 text-ellipsis">

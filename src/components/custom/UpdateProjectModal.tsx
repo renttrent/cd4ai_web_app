@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AiFillFileAdd } from "react-icons/ai";
 import { useValidatedForm } from "@/hooks/use-validated-form";
 import { ObjectSchema, object, string ,array ,mixed} from "yup";
 import { useMutation } from "@tanstack/react-query";
@@ -14,8 +13,7 @@ import { queryClient } from "@/util/query-client";
 import { Textarea } from "../ui/textarea";
 import { LoadingButton } from "../ui/loadingbutton";
 import { Project } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
-import { getProject , editProject, updateProject} from "@/util/projects/projects";
+import { updateProject} from "@/util/projects/projects";
 import { FileBadge } from "@/components/custom/FileBadge";
 
   const UpdateFormSchema: ObjectSchema<updateProjectParams> = object({
@@ -29,16 +27,18 @@ import { FileBadge } from "@/components/custom/FileBadge";
     const [isOpen, setIsOpen] = useState(false);
     const [files, setFiles] = useState<File[] | null>(null);
     const [CSVs, setCSVs] = useState<File[]>([]);
-    const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
+    const [deletedFiles, setDeletedFiles] = useState<string>('');
+    console.log("deletedFiles: "  + deletedFiles);
 
     const handleDeleteFile = (deletedFilePath: string) => {
-        setDeletedFiles((prevDeletedFiles) => [...prevDeletedFiles, deletedFilePath]);
-      };
+      setDeletedFiles((prevDeletedFiles) => deletedFiles.length > 0 ? prevDeletedFiles += "," + deletedFilePath : deletedFilePath);
+    };
 
     const { mutateAsync, isPending } = useMutation({
       mutationFn: async (data: updateProjectParams) => {
         try {
-          const res = await updateProject(project.id , data );
+          data.files = files;
+          const res = await updateProject(project.id , data);
           console.log(res);
           setIsOpen(false);
           queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -55,13 +55,20 @@ import { FileBadge } from "@/components/custom/FileBadge";
     const onSubmit = async (data:any) => {
       try {
         console.log(data);
-        const updatedData = {
+        let updatedData = { ...data };
+    
+        if (deletedFiles.length > 0) {
+          updatedData = {
             ...data,
-            delete_file_paths: `${data.delete_file_paths},${deletedFiles.join(",")}`,
+            delete_file_paths: deletedFiles,
           };
+        }
+    
         await mutateAsync(updatedData);
       } catch {
         // Handle errors if necessary
+      } finally {
+        setDeletedFiles('');
       }
     };
   

@@ -46,7 +46,7 @@ export type updateProjectParams = {
   name?: string;
   description?: string;
   files?: File[] | null;
-  delete_file_paths?: string;
+  delete_file_paths?: string | null;
 };
 
 export const updateProject = async (id: string,data: updateProjectParams) => {
