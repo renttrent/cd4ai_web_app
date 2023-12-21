@@ -22,25 +22,17 @@ const ClassCard = ({
     <Card className=" hover:bg-gray-50 mb-4 p-4 flex flex-col min-w-[200px]">
       <div className="flex gap-2 justify-between">
         <div className="font-medium text-sm text-primary">Class</div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={onEditPress}
-            className="flex gap-1"
-          >
-            <Pen size={14} />
-            <span>Edit</span>
-          </Button>
+        <div className="flex gap-4">
+        <a className="text-primary" onClick={onEditPress} style={{ cursor: 'pointer' }}>
+          <Pen size={16} />
+        </a>
           <ConfirmPopover
             variant="destructive"
             title="Are you sure?"
             description="Deleting a class will also delete all tasks associated with it"
             onConfirm={onDeletePress}
           >
-            <Button variant="destructive" className="flex gap-1">
-              <Trash size={14} />
-              <span>Delete</span>
-            </Button>
+            <Trash color="red" size={16} />
           </ConfirmPopover>
         </div>
       </div>

@@ -1,6 +1,4 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useValidatedForm } from "@/hooks/use-validated-form";
@@ -15,6 +13,7 @@ import { LoadingButton } from "../ui/loadingbutton";
 import { Project } from "@/types/types";
 import { updateProject} from "@/util/projects/projects";
 import { FileBadge } from "@/components/custom/FileBadge";
+import { Pen } from "lucide-react";
 
   const UpdateFormSchema: ObjectSchema<updateProjectParams> = object({
     name: string(),
@@ -98,11 +97,9 @@ import { FileBadge } from "@/components/custom/FileBadge";
 
     return (
       <>
-        <Button 
-            onClick={handleOpenModal} 
-            variant="outline">
-            Edit Project
-        </Button>
+        <a className="text-primary" onClick={handleOpenModal} style={{ cursor: 'pointer' }}>
+          <Pen size={16} />
+        </a>
         <Modal
           className="max-w-xl"
           open={isOpen}

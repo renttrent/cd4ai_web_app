@@ -31,21 +31,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDeletePress
         <Link href={`/project/${project.id}`} key={project.id}>
           <div className="font-bold text-md">{project.name}</div>
         </Link>
-        <div className="flex gap-1 items-center">
+        <div className="flex gap-4 items-center">
+          <div className="hidden sm:flex gap-2 text-primary">
+            <UpdateProjectButton project={project} />
+          </div>
           <ConfirmPopover
             variant="destructive"
             title="Are you sure?"
             description="Deleting a project will also delete all classes and tasks associated with it"
             onConfirm={onDeletePress}
           >
-            <Button variant="destructive" size="sm">
-              <Trash size={14} />
-              <span className="hidden sm:inline">Delete</span>
-            </Button>
+            <Trash color="red" size={16} />
           </ConfirmPopover>
-          <div className="hidden sm:flex gap-1">
-            <UpdateProjectButton project={project} />
-          </div>
+          
         </div>
       </div>
       <div className="flex gap-0.5 items-center">
