@@ -130,7 +130,7 @@ export const TaskInfo = ({ task }: { task: Task }) => {
               ? "Initial Keywords"
               : "Filtered Keywords"}
           </div>
-          <div className="flex flex-row gap-2 my-1">
+          <div className="flex flex-row flex-wrap gap-2 my-1">
             {(selectedTaskData.type == "keywords extraction"
               ? selectedTaskData?.input.init_keywords
               : selectedTaskData.input.filtered_keywords
