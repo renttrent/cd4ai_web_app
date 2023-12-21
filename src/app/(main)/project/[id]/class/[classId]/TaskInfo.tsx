@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { FaBullseye } from "react-icons/fa6";
 
 export const TaskInfo = ({ task }: { task: Task }) => {
   const selectedTaskData = task;
@@ -41,7 +42,7 @@ export const TaskInfo = ({ task }: { task: Task }) => {
           <div className="text-2xl">
             <span className="font-bold">{task.type.toUpperCase()}</span>
           </div>
-          {selectedTaskData.type == "keywords extraction" && (
+          {selectedTaskData.execution_mod === "fast" && (
             <div className="text-yellow-500">
               <TooltipProvider>
                 <Tooltip>
@@ -50,6 +51,20 @@ export const TaskInfo = ({ task }: { task: Task }) => {
                   </TooltipTrigger>
                   <TooltipContent>
                     <div>Fast Execution Mode</div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+          {selectedTaskData.execution_mod === "precise" && (
+            <div className="text-emerald-500">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <FaBullseye />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div>Precise Execution Mode</div>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

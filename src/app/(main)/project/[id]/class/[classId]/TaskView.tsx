@@ -69,6 +69,12 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
 
   const makeValid = async () => {
     await validateTask(task.id);
+    toast({
+      title: "Validated",
+      description: "Task has been validated",
+    });
+    invalidateTaskList();
+    reset(getValues());
   };
 
   return (
@@ -82,12 +88,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
           <div className="flex flex-row justify-between mt-4 gap-4">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
               <div className="text-lg font-bold">
-                Extracted Keywords
-                {selectedTaskData.result?.extracted_keywords_count && (
-                  <span className="ml-1">
-                    ({selectedTaskData.result?.extracted_keywords_count})
-                  </span>
-                )}
+                {`Extracted Keywords (${task.result?.extracted_keywords.length})`}
               </div>
               <div className="w-full">
                 <Input
