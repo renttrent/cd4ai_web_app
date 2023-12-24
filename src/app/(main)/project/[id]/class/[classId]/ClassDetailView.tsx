@@ -87,7 +87,7 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
         <section className="flex-1">
           <div className="flex flex-row flex-wrap justify-between items-center">
             <div className="flex-1 flex flex-row items-center text-2xl mt-2 mb-4 gap-4">
-              <div className="font-bold  text-stone-900">{data?.name}</div>
+              <div className="font-bold">{data?.name}</div>
             </div>
             <div className="flex gap-2">
               <Button
@@ -270,7 +270,7 @@ const TaskButton = ({
     <div
       onClick={() => onClick(task)}
       className={`flex flex-row gap-2 text-sm w-full items-center ${
-        selected ? "text-blue-500" : "text-black"
+        selected ? "text-blue-500" : ""
       }  rounded-md   cursor-pointer font-medium`}
     >
       {task.status === "in progress" ? (

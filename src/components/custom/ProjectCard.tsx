@@ -25,7 +25,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDeletePress
   }
 
   return (
-    <Card className="flex flex-col gap-1 p-4 hover:bg-gray-50">
+    <Card className="flex flex-col gap-1 p-4 hover:bg-accent">
       <div className="font-medium text-sm">Project <span className="font-bold text-sm text-primary">({project.lang.toUpperCase()})</span></div>
       <div className="flex justify-between items-center">
         <Link href={`/project/${project.id}`} key={project.id}>
