@@ -21,7 +21,7 @@ const ClassCard = ({
   return (
     <Card className=" hover:bg-gray-50 mb-4 p-4 flex flex-col min-w-[200px]">
       <div className="flex gap-2 justify-between">
-        <div className="font-medium text-sm text-primary">Class</div>
+        <div className="font-medium text-sm">Class</div>
         <div className="flex gap-4">
         <a className="text-primary" onClick={onEditPress} style={{ cursor: 'pointer' }}>
           <Pen size={16} />
@@ -41,13 +41,13 @@ const ClassCard = ({
           href={`/project/${classItem.project_id}/class/${classItem.id}`}
           className="font-semibold text-lg group flex flex-row gap-2 items-center"
         >
-          <span>{classItem.name}</span>
+          <span className="font-bold">{classItem.name}</span>
           <span className="invisible group-hover:visible">
             <FaExternalLinkAlt size={14} />
           </span>
         </Link>
         <div>
-          <p className="text-base text-gray-800 mt-2 opacity-70">
+          <p className="text-base text-stone-500 mt-2 opacity-70">
             {classItem.description}
           </p>
         </div>

@@ -85,7 +85,7 @@ const Page = ({
       </div>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center text-5xl mt-2 mb-4 gap-4">
-          <div className="font-bold text-stone-900">{project?.name}</div>
+          <div className="font-bold">{project?.name}</div>
         </div>
         <div className="flex flex-row items-center gap-4 font-bold">
           <button
@@ -108,7 +108,7 @@ const Page = ({
         {/* <div className="text-stone-700">Description:</div> */}
         <div className="text-gray-600  font-medium">{project.description}</div>
         <div className="flex flex-row gap-2 my-2">
-          <div className="text-stone-700">Files:</div>
+          <div>Files:</div>
           <div className="flex flex-row gap-4">
             {project?.files.map((file: any, index: number) => (
               <FileBadge
