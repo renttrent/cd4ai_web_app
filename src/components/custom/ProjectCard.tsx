@@ -25,8 +25,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDeletePress
   }
 
   return (
-    <Card className="flex flex-col gap-1 p-4 hover:bg-gray-50">
-      <div className="font-medium text-sm text-primary">Project <span className="font-bold text-sm">({project.lang.toUpperCase()})</span></div>
+    <Card className="flex flex-col gap-1 p-4 hover:bg-accent">
+      <div className="font-medium text-sm">Project <span className="font-bold text-sm text-primary">({project.lang.toUpperCase()})</span></div>
       <div className="flex justify-between items-center">
         <Link href={`/project/${project.id}`} key={project.id}>
           <div className="font-bold text-md">{project.name}</div>
@@ -52,7 +52,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDeletePress
               {project.files.length > 1 ? project.files.length + " files" : project.files.length > 0 ? "1 file" : null}
             </div>
       </div>
-      <div className="text-sm text-gray-500 line-clamp-3 text-ellipsis">
+      <div className="text-sm line-clamp-3 text-ellipsis">
         {project.description}
       </div>
     </Card>

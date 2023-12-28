@@ -130,7 +130,7 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
                   {final_words.map((keyword, index) => (
                     <Badge
                       key={index}
-                      className="w-fit cursor-pointer hover:bg-red-500 hover:text-white text-white bg-primary"
+                      className="w-fit cursor-pointer hover:bg-red-500 hover:text-white text-black bg-primary"
                       variant="secondary"
                       onClick={() =>
                         setValue(

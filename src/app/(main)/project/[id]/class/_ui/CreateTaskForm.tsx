@@ -195,7 +195,7 @@ export const CreateTaskForm = ({
           return (
             <div
               key={index}
-              className="p-4 bg-gray-50 border border-gray-100 rounded-md flex items-center justify-between gap-2 "
+              className="p-4 text-black bg-gray-50 border border-gray-100 rounded-md flex items-center justify-between gap-2 "
             >
               <span className="text-lg font-bold">
                 {

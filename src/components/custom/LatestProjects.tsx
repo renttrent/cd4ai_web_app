@@ -42,7 +42,7 @@ export const LatestProjectsView = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="search..."
-          className="p-2 border-2 rounded-md focus:outline-none focus:border-violet-500 focus-visible:border-violet-500"
+          className="p-2 border-2 rounded-md bg-card focus:outline-none focus:border-violet-500 focus-visible:border-violet-500"
           style={{ width: "31.5%", lineHeight: "2%" }}
         />
       </div>

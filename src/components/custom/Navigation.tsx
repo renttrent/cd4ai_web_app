@@ -8,8 +8,9 @@ import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "../ui/modetoggle";
 
-const navButtonStyles = " text-white px-3  py-1 bg-gray-600   hover:bg-primary";
+const navButtonStyles = " text-white px-3  py-1 bg-gray-600   hover:bg-gray-800";
 
 const Helper = ({ content, active }: { content: string; active: boolean }) => {
   return (
@@ -59,7 +60,7 @@ export const Navigation = () => {
           href="/"
           className={cn(
             navButtonStyles,
-            pathname.includes("project") && "bg-primary"
+            pathname.includes("project") && "bg-gray-300"
           )}
         >
           <div className="flex flex-row relative  gap-1 items-center">
@@ -68,6 +69,8 @@ export const Navigation = () => {
           </div>
         </Link>
       </div>
+      <div className="flex flex-col gap-4 items-center ">
+        <ModeToggle/>
       <button
         onClick={() => {
           signOut();
@@ -79,6 +82,7 @@ export const Navigation = () => {
           <div>Logout</div>
         </div>
       </button>
+      </div>
     </nav>
   );
 };
