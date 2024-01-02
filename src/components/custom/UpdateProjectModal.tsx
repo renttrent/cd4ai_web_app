@@ -18,6 +18,7 @@ import { Pen } from "lucide-react";
 const UpdateFormSchema: ObjectSchema<updateProjectParams> = object({
   name: string(),
   description: string(),
+  language: string().oneOf(["en", "de"]).required(),
   files: array(),
   delete_file_paths: string(),
 }).defined();
@@ -25,9 +26,7 @@ const UpdateFormSchema: ObjectSchema<updateProjectParams> = object({
 export function UpdateProjectButton({ project }: { project: Project }) {
   const [isOpen, setIsOpen] = useState(false);
   const [files, setFiles] = useState<File[] | null>(null);
-  const [CSVs, setCSVs] = useState<File[]>([]);
   const [deletedFiles, setDeletedFiles] = useState<string>("");
-  console.log("deletedFiles: " + deletedFiles);
   const [formValues, setFormValues] = useState({
     name: project?.name || "",
     description: project?.description || "",
@@ -108,63 +107,79 @@ export function UpdateProjectButton({ project }: { project: Project }) {
         <Pen size={16} />
       </a>
       <Modal
-        className="max-w-xl"
+        className="max-w-screen-md overflow-y-auto" // Adjust the maximum width as needed
         open={isOpen}
         title="Edit Project"
         description="Update your project details here. Click Save Changes when you're done."
         onClose={handleCloseModal}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
+          <div className="p-4 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Label htmlFor="name">Name</Label>
               <Input
                 {...register("name")}
                 id="name"
-                className="col-span-3"
+                className="col-span-1"
                 defaultValue={project?.name || ""}
                 disabled={isPending}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
+            <div className="grid grid-cols-2 gap-4">
+              <Label htmlFor="description">Description</Label>
               <Textarea
                 {...register("description")}
                 id="description"
-                className="col-span-3"
+                className="col-span-1"
                 defaultValue={project?.description || ""}
                 disabled={isPending}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label>Language</Label>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
+                  <Input
+                    {...register("language")}
+                    type="radio"
+                    id="lang-en-update"
+                    value="en"
+                    defaultChecked={project.lang === "en"}
+                    disabled={isPending}
+                  />
+                  <Label htmlFor="lang-en-update">English</Label>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Input
+                    {...register("language")}
+                    type="radio"
+                    id="lang-de-update"
+                    value="de"
+                    defaultChecked={project.lang === "de"}
+                    disabled={isPending}
+                  />
+                  <Label htmlFor="lang-de-update">German</Label>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <Label htmlFor="files">Choose Files</Label>
               <Input
                 id="files"
                 type="file"
                 accept=".txt,.csv"
-                className="col-span-3"
+                className="col-span-1"
                 disabled={isPending}
                 onChange={(e) => {
-                  // @ts-ignore
-                  const length = e.target.files.length;
-
-                  let files = [];
-                  for (let index = 0; index < length; index++) {
-                    // @ts-ignore
-                    files.push(e.target.files[index]);
-                  }
-                  setFiles(files);
+                  const filesArray = Array.from(e.target.files || []);
+                  setFiles(filesArray);
                 }}
                 multiple
               />
             </div>
-            <div className="flex flex-row gap-2 my-2">
+            <div className="flex items-center gap-2 my-2">
               <div className="text-stone-700">Files:</div>
-              <div className="flex flex-row gap-4">
+              <div className="flex flex-wrap gap-4">
                 {project.files.map((file: any, index: number) => (
                   <FileBadge
                     key={index}
@@ -175,13 +190,11 @@ export function UpdateProjectButton({ project }: { project: Project }) {
                 ))}
               </div>
             </div>
-            <LoadingButton
-              disabled={isPending}
-              isLoading={isPending}
-              type="submit"
-            >
-              Save Changes
-            </LoadingButton>
+            <div className="flex justify-end">
+              <LoadingButton disabled={isPending} isLoading={isPending} type="submit">
+                Save Changes
+              </LoadingButton>
+            </div>
           </div>
         </form>
       </Modal>

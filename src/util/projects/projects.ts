@@ -45,6 +45,7 @@ export const createProject = async (data: createProjectParams) => {
 export type updateProjectParams = {
   name?: string;
   description?: string;
+  language: "en" | "de";
   files?: File[] | null;
   delete_file_paths?: string | null;
 };

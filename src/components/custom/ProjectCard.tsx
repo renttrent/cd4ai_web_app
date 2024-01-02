@@ -1,14 +1,9 @@
 import { Project } from "@/types/types";
 import Link from "next/link";
 import React from "react";
-import { AiFillFolderOpen } from "react-icons/ai";
-import { FileBadge } from "./FileBadge";
 import { Card } from "../ui/card";
-import { Clipboard, Paperclip } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { getProject , deleteProject} from "@/util/projects/projects";
+import { Paperclip } from "lucide-react";
 import { ConfirmPopover } from "./ConfirmPopover";
-import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
 import { UpdateProjectButton } from "./UpdateProjectModal";
 
@@ -28,7 +23,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDeletePress
     <Card className="flex flex-col gap-1 p-4 hover:bg-accent">
       <div className="font-medium text-sm">Project <span className="font-bold text-sm text-primary">({project.lang.toUpperCase()})</span></div>
       <div className="flex justify-between items-center">
-        <Link href={`/project/${project.id}`} key={project.id}>
+        <Link href={`/project/${project.id}`} key={project.id} className="cursor-pointer">
           <div className="font-bold text-md">{project.name}</div>
         </Link>
         <div className="flex gap-4 items-center">
