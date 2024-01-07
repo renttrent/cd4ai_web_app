@@ -19,6 +19,7 @@ export interface KeywordsExtractionTask extends BaseTask {
     extracted_keywords_count: number;
     extracted_keywords: string[];
     filtered_keywords: string[];
+    manual_keywords: string[];
   } | null;
   input: {
     files_to_consider: {
@@ -34,6 +35,7 @@ export interface ContextWindowsExtractionTask extends BaseTask {
   result: {
     extracted_context_windows: string[];
     filtered_context_windows: string[];
+    manual_context_windows: string[];
   } | null;
   input: {
     files_to_consider: {

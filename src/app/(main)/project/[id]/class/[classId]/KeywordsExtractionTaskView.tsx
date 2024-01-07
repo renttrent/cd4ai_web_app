@@ -10,6 +10,11 @@ import { Input } from "@/components/ui/input";
 import { useStartTask } from "../_hooks/use-start-task";
 import { useToast } from "@/components/ui/use-toast";
 import { TaskInfo } from "./TaskInfo";
+import {
+  SortState,
+  Sorter,
+  getSortingFunction,
+} from "@/components/custom/Sorter";
 
 type KeywordsState = {
   final_keywords: string[];
@@ -19,7 +24,11 @@ const KeywordsSchema = object({
   final_keywords: array().of(string().required()).required(),
 });
 
-export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
+export const KeywordsExtractionTaskView = ({
+  task,
+}: {
+  task: KeywordsExtractionTask;
+}) => {
   const { handleSubmit, watch, setValue, reset, getValues, formState } =
     useValidatedForm({
       schema: KeywordsSchema,
@@ -50,9 +59,13 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
 
   const selectedTaskData = task;
 
+  const [sort, setSort] = useState<SortState>();
+
   const unselected_extracted_keywords = (
     selectedTaskData?.result?.extracted_keywords ?? []
-  ).filter((word) => !final_words.includes(word) && word.includes(filter));
+  )
+    .filter((word) => !final_words.includes(word) && word.includes(filter))
+    .sort(getSortingFunction(sort));
 
   const onSubmit = async (data: KeywordsState) => {
     await updateTask({
@@ -90,12 +103,13 @@ export const TaskView = ({ task }: { task: KeywordsExtractionTask }) => {
               <div className="text-lg font-bold">
                 {`Extracted Keywords (${task.result?.extracted_keywords.length})`}
               </div>
-              <div className="w-full">
+              <div className="w-full flex items-center gap-2">
                 <Input
                   placeholder="Search Keyword"
                   className="h-6"
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
+                <Sorter onSort={setSort} />
               </div>
               <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto no-scrollbar border rounded-md p-2 hover:shadow-md">
                 {unselected_extracted_keywords.map((keyword, index) => (

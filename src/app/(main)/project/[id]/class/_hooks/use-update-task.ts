@@ -10,7 +10,13 @@ export const useUpdateTask = () => {
       data,
     }: {
       taskId: string;
-      data: { name?: string; result?: { filtered_results: string[] } };
+      data: {
+        name?: string;
+        result?: {
+          filtered_results: string[];
+          manual_added_results?: string[];
+        };
+      };
     }) => {
       return updateTask(taskId, data);
     },

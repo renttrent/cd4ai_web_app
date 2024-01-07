@@ -14,6 +14,11 @@ import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
+import {
+  SortState,
+  Sorter,
+  getSortingFunction,
+} from "@/components/custom/Sorter";
 
 type WindowsState = {
   final_windows: string[];
@@ -61,11 +66,15 @@ export const ContextWindowTaskView = ({
   const { toast } = useToast();
   const final_windows = watch("final_windows");
 
+  const [sort, setSort] = useState<SortState>();
+
   const unselected_extracted_windows = (
     selectedTaskData?.result?.extracted_context_windows ?? []
-  ).filter(
-    (window) => !final_windows.includes(window) && window.includes(filter)
-  );
+  )
+    .filter(
+      (window) => !final_windows.includes(window) && window.includes(filter)
+    )
+    .sort(getSortingFunction(sort));
 
   const onSubmit = async (data: WindowsState) => {
     await updateTask({
@@ -97,12 +106,13 @@ export const ContextWindowTaskView = ({
           <div className="flex flex-row justify-between mt-4 gap-4">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
               <div className="text-lg font-bold">Extracted Windows</div>
-              <div className="w-full">
+              <div className="w-full flex gap-2">
                 <Input
                   placeholder="Search Window"
                   className="h-6"
                   onChange={(e) => setFilter(e.currentTarget.value ?? "")}
                 />
+                <Sorter onSort={setSort} />
               </div>
               <div className="flex gap-2 flex-wrap  max-h-80 overflow-y-auto no-scrollbar rounded-md p-2 border hover:shadow-md">
                 {unselected_extracted_windows.map((window, index) => (

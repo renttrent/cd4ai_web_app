@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/accordion";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaCircleXmark } from "react-icons/fa6";
-import { TaskView } from "./TaskView";
+import { KeywordsExtractionTaskView } from "./KeywordsExtractionTaskView";
 import {
   Tooltip,
   TooltipContent,
@@ -110,7 +110,7 @@ export const ClassDetailView = ({ classId }: { classId: string }) => {
             {selectedTask !== null &&
             taskListData &&
             taskListData.length > 0 ? (
-              <TaskView
+              <KeywordsExtractionTaskView
                 key={taskListData[selectedTask].id}
                 task={taskListData[selectedTask] as KeywordsExtractionTask}
               />
