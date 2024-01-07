@@ -54,7 +54,7 @@ export function UpdateProjectButton({ project }: { project: Project }) {
     },
   });
 
-  const { register, handleSubmit } = useValidatedForm({
+  const { register, handleSubmit, reset } = useValidatedForm({
     schema: UpdateFormSchema,
   });
 
@@ -79,10 +79,7 @@ export function UpdateProjectButton({ project }: { project: Project }) {
   };
 
   const resetFormState = () => {
-    setFormValues({
-      name: project?.name || "",
-      description: project?.description || "",
-    });
+    reset();
     setFiles([]);
     setDeletedFiles("");
   };
@@ -191,7 +188,11 @@ export function UpdateProjectButton({ project }: { project: Project }) {
               </div>
             </div>
             <div className="flex justify-end">
-              <LoadingButton disabled={isPending} isLoading={isPending} type="submit">
+              <LoadingButton
+                disabled={isPending}
+                isLoading={isPending}
+                type="submit"
+              >
                 Save Changes
               </LoadingButton>
             </div>

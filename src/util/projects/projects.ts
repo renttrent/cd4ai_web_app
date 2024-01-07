@@ -17,7 +17,7 @@ type createProjectParams = {
   name: string;
   description: string;
   files: File[] | null;
-  language : "en" | "de";
+  language: "en" | "de";
 };
 export const createProject = async (data: createProjectParams) => {
   console.log(data);
@@ -26,11 +26,11 @@ export const createProject = async (data: createProjectParams) => {
   fomrmData.append("name", data.name);
   fomrmData.append("description", data.description);
   fomrmData.append("language", data.language);
-  
+
   (data.files ?? []).forEach((file) => {
     fomrmData.append("files", file);
   });
-  
+
   try {
     const res = await axios.post("/project", fomrmData, {
       headers: {
@@ -50,17 +50,17 @@ export type updateProjectParams = {
   delete_file_paths?: string | null;
 };
 
-export const updateProject = async (id: string,data: updateProjectParams) => {
+export const updateProject = async (id: string, data: updateProjectParams) => {
   console.log(data);
 
   const fomrmData = new FormData();
   fomrmData.append("name", data?.name as string);
   fomrmData.append("description", data?.description as string);
-  
+  fomrmData.append("language", data.language);
   (data.files ?? []).forEach((file) => {
     fomrmData.append("files", file);
   });
-  if(data.delete_file_paths) 
+  if (data.delete_file_paths)
     fomrmData.append("delete_file_paths", data.delete_file_paths as string);
 
   try {
@@ -73,7 +73,7 @@ export const updateProject = async (id: string,data: updateProjectParams) => {
   } catch (error) {
     console.error("Error submitting form:", error);
   }
-}; 
+};
 export const editProject = async (id: string, data: updateProjectParams) => {
   try {
     const res = await axios.put(`/project/${id}`, data);
