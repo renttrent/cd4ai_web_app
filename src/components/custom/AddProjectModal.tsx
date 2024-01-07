@@ -44,7 +44,7 @@ export function AddProjectButton() {
     },
   });
 
-  const { register, handleSubmit } = useValidatedForm({
+  const { register, handleSubmit, reset } = useValidatedForm({
     schema: FormSchema,
   });
 
@@ -88,7 +88,9 @@ export function AddProjectButton() {
         title="Add Project"
         description="Add your project details here. Click save when you're done.
       "
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false), reset();
+        }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
@@ -124,7 +126,6 @@ export function AddProjectButton() {
                       type="radio"
                       id="lang-en"
                       value="en"
-                      
                     />
                     <Label htmlFor="lang-en">English</Label>
                   </div>
