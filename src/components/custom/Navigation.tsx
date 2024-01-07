@@ -9,8 +9,10 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "../ui/modetoggle";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
-const navButtonStyles = " text-white px-3  py-1 bg-gray-600   hover:bg-gray-800";
+const navButtonStyles =
+  " text-white px-3  py-1 bg-gray-600   hover:bg-gray-800";
 
 const Helper = ({ content, active }: { content: string; active: boolean }) => {
   return (
@@ -57,6 +59,25 @@ export const Navigation = () => {
           </svg>
         </div>
         <Link
+          href="/profile"
+          className={cn(
+            navButtonStyles,
+            // pathname.includes("project") && "bg-gray-300"
+            "bg-transparent hover:bg-transparent"
+          )}
+        >
+          <Avatar>
+            <AvatarFallback
+              className={cn(
+                "text-black dark:text-white",
+                pathname.includes("profile") && "bg-gray-300 hover:bg-gray-400"
+              )}
+            >
+              CN
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+        <Link
           href="/"
           className={cn(
             navButtonStyles,
@@ -70,18 +91,18 @@ export const Navigation = () => {
         </Link>
       </div>
       <div className="flex flex-col gap-4 items-center ">
-        <ModeToggle/>
-      <button
-        onClick={() => {
-          signOut();
-        }}
-        className={navButtonStyles}
-      >
-        <div className="flex flex-row relative items-center">
-          <BiSolidLogOut size={20} />
-          <div>Logout</div>
-        </div>
-      </button>
+        <ModeToggle />
+        <button
+          onClick={() => {
+            signOut();
+          }}
+          className={navButtonStyles}
+        >
+          <div className="flex flex-row relative items-center">
+            <BiSolidLogOut size={20} />
+            <div>Logout</div>
+          </div>
+        </button>
       </div>
     </nav>
   );

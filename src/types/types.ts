@@ -22,3 +22,14 @@ export interface Class {
   is_favorite: boolean; // Whether the class is a favorite for the user
   modification_time: string;
 }
+
+export type User = {
+  firstname: string;
+  lastname: string;
+  account_settings:
+    | {
+        de_embaddings_model: string;
+        en_embaddings_model: string;
+      }
+    | undefined;
+};
