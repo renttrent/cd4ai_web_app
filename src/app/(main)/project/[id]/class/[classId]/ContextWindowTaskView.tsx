@@ -19,13 +19,17 @@ import {
   Sorter,
   getSortingFunction,
 } from "@/components/custom/Sorter";
+import { AddBadge } from "../_ui/AddBadge";
+import { RecommendKeywords } from "../_ui/RecommendKeywords";
 
 type WindowsState = {
   final_windows: string[];
+  manual_windows?: string[];
 };
 
 const windowsSchema = object({
   final_windows: array().of(string().required()).required(),
+  manual_windows: array().of(string().required()),
 });
 
 export const ContextWindowTaskView = ({
@@ -50,6 +54,7 @@ export const ContextWindowTaskView = ({
       schema: windowsSchema,
       defaultValues: {
         final_windows: selectedTaskData.result?.filtered_context_windows ?? [],
+        manual_windows: selectedTaskData.result?.manual_context_windows ?? [],
       },
     });
 
@@ -66,6 +71,7 @@ export const ContextWindowTaskView = ({
   const { toast } = useToast();
   const final_windows = watch("final_windows");
 
+  const manual_windows = watch("manual_windows");
   const [sort, setSort] = useState<SortState>();
 
   const unselected_extracted_windows = (
@@ -79,7 +85,12 @@ export const ContextWindowTaskView = ({
   const onSubmit = async (data: WindowsState) => {
     await updateTask({
       taskId: selectedTaskData.id,
-      data: { result: { filtered_results: data.final_windows ?? [] } },
+      data: {
+        result: {
+          filtered_results: data.final_windows ?? [],
+          manual_added_results: data.manual_windows ?? [],
+        },
+      },
     });
     toast({
       title: "Updated",
@@ -106,7 +117,7 @@ export const ContextWindowTaskView = ({
           <div className="flex flex-row justify-between mt-4 gap-4">
             <div className=" flex-1 flex flex-col gap-4 p-2 ">
               <div className="text-lg font-bold">Extracted Windows</div>
-              <div className="w-full flex gap-2">
+              <div className="w-full flex gap-2 items-center">
                 <Input
                   placeholder="Search Window"
                   className="h-6"
@@ -135,11 +146,15 @@ export const ContextWindowTaskView = ({
               <div className="text-left text-lg font-bold">
                 Filtered Windows
               </div>
-              <div className="invisible">
-                <Input
-                  placeholder="search keyword"
-                  className="h-6"
-                  onChange={(e) => setFilter(e.currentTarget.value ?? "")}
+              <div className="">
+                <RecommendKeywords
+                  onAccept={(data) => {
+                    const set = new Set([...(final_windows ?? []), ...data]);
+                    setValue("final_windows", Array.from(set), {
+                      shouldDirty: true,
+                    });
+                  }}
+                  taskId={selectedTaskData.id}
                 />
               </div>
               {final_windows.length > 0 && (
@@ -173,6 +188,38 @@ export const ContextWindowTaskView = ({
                   ))}
                 </div>
               )}
+              <div className="text-left text-lg font-bold">Manual Windows</div>
+              <div className="flex gap-2 flex-wrap max-h-80 overflow-y-auto no-scrollbar rounded-md border p-2 hover:shadow-md">
+                {(manual_windows ?? []).map((keyword, index) => (
+                  <Badge
+                    key={index}
+                    className="w-fit cursor-pointer hover:bg-red-500 hover:text-white bg-primary"
+                    variant="secondary"
+                    onClick={() =>
+                      setValue(
+                        "manual_windows",
+                        (manual_windows ?? []).filter(
+                          (word) => word !== keyword
+                        ),
+                        {
+                          shouldDirty: true,
+                        }
+                      )
+                    }
+                  >
+                    {keyword}
+                  </Badge>
+                ))}
+                <AddBadge
+                  onAdd={(word) =>
+                    setValue(
+                      "manual_windows",
+                      [...(manual_windows ?? []), word],
+                      { shouldDirty: true }
+                    )
+                  }
+                />
+              </div>
             </div>
           </div>
         )}

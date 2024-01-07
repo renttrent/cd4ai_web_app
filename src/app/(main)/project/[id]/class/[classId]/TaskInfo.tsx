@@ -35,6 +35,7 @@ export const TaskInfo = ({ task }: { task: Task }) => {
       });
     }
   );
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row items-center justify-between">
